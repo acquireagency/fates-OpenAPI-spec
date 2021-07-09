@@ -61,76 +61,82 @@ paths:
         201:
           description: model optimized
           schema:
-            $ref: '#definitions/OptResults'
+            $ref: '#/definitions/OptResults'
         400:
           description: invalid input, object invalid
         401:
           description: optimization error
           schema:
-            $ref: '#definition/OptError'
+            $ref: '#/definitions/OptError'
 
 definitions:
 
   ModelData:
+  
+    title: The Model Data
+    description: data consituting a marketing model
+    type: object
+    
+    properties:
 
-    spend:
-      description: dollar value of target total ad spend
-      type: number
-
-    revenue:
-      description: dollar value of target revenue
-      type: number
-
-    aov:
-      description: average order value
-      type: number
-
-    cogs:
-      description: the average cost of goods sold per order
-      type: number
-
-    contributionMargin:
-      description: dollar value of the resultant contribution margin given fees
-      type: number
-
-    grossMargin:
-      description: the dollar value of the gross margin given fees
-      type: number
-
-    scalePct:
-      description: the percentage change in target ad spend from previous period
-      type: number
-
-    roas:
-      description: the target return on ad spend
-      type: number
-
-    breakevenRoas:
-      description: the return on ad spend required for break even given all other variables are fixed
-      type: number
-
-    roasPctDifference:
-      description: the percentage difference between the target return on ad spend and the breakeven return on ad spend
-      type: number
-
-    purchases:
-      description: total target purchases
-      type: number
-
-    totalCogs:
-      description: total dollar value of the cost to produce the sold goods
-      type: number
-
-    cpa:
-      description: the target cost per acquisition
-      type: number
-
-    fee:
-      description: the fixed fee applied to the given time span
-      type: number
-
-    pctFee:
-      description: a variable fee derived from total revenue or spend for the given time span
+      spend:
+        description: dollar value of target total ad spend
+        type: number
+  
+      revenue:
+        description: dollar value of target revenue
+        type: number
+  
+      aov:
+        description: average order value
+        type: number
+  
+      cogs:
+        description: the average cost of goods sold per order
+        type: number
+  
+      contributionMargin:
+        description: dollar value of the resultant contribution margin given fees
+        type: number
+  
+      grossMargin:
+        description: the dollar value of the gross margin given fees
+        type: number
+  
+      scalePct:
+        description: the percentage change in target ad spend from previous period
+        type: number
+  
+      roas:
+        description: the target return on ad spend
+        type: number
+  
+      breakevenRoas:
+        description: the return on ad spend required for break even given all other variables are fixed
+        type: number
+  
+      roasPctDifference:
+        description: the percentage difference between the target return on ad spend and the breakeven return on ad spend
+        type: number
+  
+      purchases:
+        description: total target purchases
+        type: number
+  
+      totalCogs:
+        description: total dollar value of the cost to produce the sold goods
+        type: number
+  
+      cpa:
+        description: the target cost per acquisition
+        type: number
+  
+      fee:
+        description: the fixed fee applied to the given time span
+        type: number
+  
+      pctFee:
+        description: a variable fee derived from total revenue or spend for the given time span
     
   BuildParams:
 
@@ -232,17 +238,13 @@ definitions:
         type: array
         
         items:
-          type: object
-          
-          properties:
-            $ref: '#/definitions/ModelData'
+          $ref: '#/definitions/ModelData'
 
       totals:
         type: array
 
         items:
-          type: object
-
-        properties:
           $ref: '#/definitions/ModelData'
-
+          
+  OptError:
+    type: string
