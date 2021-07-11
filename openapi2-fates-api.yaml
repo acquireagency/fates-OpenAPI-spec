@@ -151,12 +151,14 @@ definitions:
       initialSpend:
         description: The dollar value of spend during the initial period
         type: number
-        exclusiveMinimum: 0
+        minimum: 0
+        exclusiveMinimum: true
 
       initialRoas:
         description: The ROAS attained during the initial period
         type: number
-        exclusiveMinimum: 0
+        minimum: 0
+        exclusiveMinimum: true
 
       fee:
         description: A fixed cost 'fee' applied to each period
@@ -165,7 +167,8 @@ definitions:
       pctFeeBasistFee:
         description: A variable cost applied to each period
         type: number
-        exclusiveMinimum: 0
+        minimum: 0
+        exclusiveMinimum: true
         maximum: 100
 
       pctFeeBasis:
@@ -214,12 +217,14 @@ definitions:
             aov:
               description: The average order value over a period
               type: number
-              exclusiveMinimum: 0
+              minimum: 0
+              exclusiveMinimum: true
 
             cogs:
               description: The average cost of goods sold over a period
               type: number
-              exclusiveMinimum: 0
+              minimum: 0
+              exclusiveMinimum: True
 
     required:
     - initialSpend
