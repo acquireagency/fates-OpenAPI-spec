@@ -4,9 +4,9 @@ swagger: '2.0'
 
 info:
 
-  title: test-api 
+  title: fates-api 
 
-  description: Sample API on API Gateway with a Google Cloud Functions backend
+  description: Fates API on API Gateway with a Google Cloud Functions backend
 
   version: 1.0.0
 
@@ -17,6 +17,8 @@ schemes:
 produces:
 
   - application/json
+
+basePath: /v1
 
 tags:
 - name: admins
