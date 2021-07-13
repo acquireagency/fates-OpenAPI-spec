@@ -18,7 +18,7 @@ produces:
 
   - application/json
 
-basePath: /v1
+# basePath: /v1
 
 tags:
 - name: admins
@@ -69,7 +69,7 @@ paths:
         401:
           description: optimization error
           schema:
-            $ref: '#/definitions/OptError'
+            $ref: '#/definitions/DefaultError'
 
 definitions:
 
@@ -253,5 +253,46 @@ definitions:
         items:
           $ref: '#/definitions/ModelData'
           
-  OptError:
-    type: string
+  DefaultError:
+  
+    title: Default error response
+  
+    type: object
+    
+    properties:
+    
+      timestamp:
+        description: UTC timestamp of error
+        type: string
+        
+      status:
+        description: Error status code
+        type: string
+        
+      errors:
+        description: Collection of propagated errors
+        type: array
+        
+        items:
+          type: object
+          
+          properties:
+            
+            error:
+              description: Error identifier
+              type: string
+            
+            message:
+              description: Human readable and displayable text
+              type: string
+              
+            detail:
+              description: More detailed error message for developers
+              type: string
+              
+            help:
+              description: URL for additional help and documentation on error
+              type: string
+              
+      instance:
+        type: string
