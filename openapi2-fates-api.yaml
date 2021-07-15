@@ -268,31 +268,22 @@ definitions:
       status:
         description: Error status code
         type: string
-        
-      errors:
-        description: Collection of propagated errors
-        type: array
-        
-        items:
-          type: object
-          
-          properties:
             
-            error:
-              description: Error identifier
-              type: string
-            
-            message:
-              description: Human readable and displayable text
-              type: string
-              
-            detail:
-              description: More detailed error message for developers
-              type: string
-              
-            help:
-              description: URL for additional help and documentation on error
-              type: string
+      error:
+        description: Error identifier
+        type: string
+
+      message:
+        description: Human readable and displayable text
+        type: string
+        
+      devMessage:
+        description: Developer friendly error message
+        type: string
+
+      help:
+        description: URL for additional help and documentation on error
+        type: string
               
       instance:
         type: string
