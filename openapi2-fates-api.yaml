@@ -29,7 +29,7 @@ tags:
 paths:
 
   /optimize:
-
+  
     post:
 
       tags:
@@ -70,6 +70,14 @@ paths:
           description: optimization error
           schema:
             $ref: '#/definitions/DefaultError'
+            
+    options:
+      operationId: corsOptimize
+      x-google-backend:
+        address: https://us-central1-fates-ai-dev.cloudfunctions.net/optimize
+      responses:
+        '200':
+          description: A successful response
 
 definitions:
 
