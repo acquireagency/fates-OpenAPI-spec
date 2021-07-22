@@ -256,9 +256,8 @@ definitions:
           $ref: '#/definitions/ModelData'
 
       totals:
-        type: array
-
-        items:
+        descirption: Totals for the optimization results data
+        schema:
           $ref: '#/definitions/ModelData'
           
   DefaultError:
