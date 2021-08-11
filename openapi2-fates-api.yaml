@@ -43,7 +43,7 @@ paths:
 
       x-google-backend:
 
-        address: https://us-central1-fates-ai-dev.cloudfunctions.net/optimize
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/optimize
 
       consumes:
       - application/json
@@ -64,17 +64,11 @@ paths:
           description: model optimized
           schema:
             $ref: '#/definitions/OptResults'
-        400:
-          description: invalid input, object invalid
-        401:
-          description: optimization error
-          schema:
-            $ref: '#/definitions/DefaultError'
             
     options:
       operationId: corsOptimize
       x-google-backend:
-        address: https://us-central1-fates-ai-dev.cloudfunctions.net/optimize
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/optimize 
       responses:
         '200':
           description: A successful response
@@ -188,7 +182,7 @@ definitions:
         - revenue
         - spend
 
-      rowParams:
+      timeSpans:
         type: array
 
         items:
@@ -234,7 +228,7 @@ definitions:
               description: The average cost of goods sold over a period
               type: number
               minimum: 0
-              exclusiveMinimum: True
+              exclusiveMinimum: true
 
     required:
     - initialSpend
