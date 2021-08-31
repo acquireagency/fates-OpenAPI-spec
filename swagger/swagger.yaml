@@ -5,8 +5,8 @@ info:
   version: 1.0.0
   title: fates-api
   contact: {}
-host: virtserver.swaggerhub.com
-basePath: /T9746/fates-api/1.0.0
+host: fates-api-gateway-v1-axy6gf5r.uc.gateway.dev
+basePath: /v1
 tags:
 - name: admins
   description: Secured Admin-only calls
