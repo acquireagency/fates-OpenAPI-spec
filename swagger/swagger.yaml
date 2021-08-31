@@ -1,0 +1,504 @@
+---
+swagger: "2.0"
+info:
+  description: Fates API on API Gateway with a Google Cloud Run backend
+  version: 1.0.0
+  title: fates-api
+  contact: {}
+host: virtserver.swaggerhub.com
+basePath: /T9746/fates-api/1.0.0
+tags:
+- name: admins
+  description: Secured Admin-only calls
+- name: developers
+  description: Operations available to regular developers
+schemes:
+- https
+consumes:
+- application/json
+produces:
+- application/json
+paths:
+  /auth:
+    get:
+      tags:
+      - developers
+      summary: getUser
+      description: Read a User's data
+      operationId: getUser
+      produces:
+      - application/json
+      parameters:
+      - name: uid
+        in: query
+        description: The uid assigned to a user
+        required: false
+        type: string
+        maxLength: 128
+        minLength: 1
+      - name: email
+        in: query
+        description: A user's email address. Must be a valid email address
+        required: false
+        type: string
+      responses:
+        "200":
+          description: User data recieved
+      x-google-backend:
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/auth
+    post:
+      tags:
+      - admins
+      summary: createUser
+      description: Create a new User
+      operationId: createUser
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - in: body
+        name: userData
+        description: Data for creating user
+        required: true
+        schema:
+          $ref: '#/definitions/CreateUser'
+      responses:
+        "200":
+          description: New user successfully created
+          headers: {}
+      x-google-backend:
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/auth
+    put:
+      tags:
+      - admins
+      summary: updateUser
+      description: Update a user's data
+      operationId: updateUser
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - in: body
+        name: userData
+        description: Data to be updated
+        required: false
+        schema:
+          $ref: '#/definitions/CreateUser'
+      responses:
+        "200":
+          description: User's data successfully updated
+      x-google-backend:
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/auth
+    delete:
+      tags:
+      - admins
+      summary: deleteUser
+      description: Permanently delete a user from database
+      operationId: deleteUser
+      produces:
+      - application/json
+      parameters:
+      - name: uid
+        in: query
+        description: uid of user to be deleted
+        required: true
+        type: string
+        maxLength: 128
+        minLength: 1
+      responses:
+        "200":
+          description: Successfully deleted user
+      x-google-backend:
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/auth
+    options:
+      operationId: corsAuth
+      parameters: []
+      responses:
+        "200":
+          description: An accepted preflight request
+      x-google-backend:
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/auth
+  /optimize:
+    post:
+      tags:
+      - developers
+      description: Run the function and recieve the resulting output
+      operationId: runOptimize
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - in: body
+        name: optParams
+        description: Parameters for building an optimized model
+        required: true
+        schema:
+          $ref: '#/definitions/OptParams'
+      responses:
+        "200":
+          description: Optimized model dataset
+          schema:
+            $ref: '#/definitions/OptResults'
+      x-google-backend:
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/optimize
+    options:
+      operationId: corsOptimize
+      parameters: []
+      responses:
+        "200":
+          description: An accepted preflight request
+      x-google-backend:
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/optimize
+  /testBudget:
+    post:
+      tags:
+      - developers
+      summary: runTestBudgetCalculator
+      description: "Calculate test budget, cpa targets, and number of ads"
+      operationId: runTestBudgetCalculator
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - in: body
+        name: calcParams
+        description: User's input parameters for the calculation
+        required: true
+        schema:
+          $ref: '#/definitions/TestBudgetParams'
+      responses:
+        "200":
+          description: Computation ran successfully
+          schema:
+            $ref: '#/definitions/TestBudgetResults'
+      x-google-backend:
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/testBudget
+    options:
+      operationId: corsTestBudget
+      parameters: []
+      responses:
+        "200":
+          description: An accepted preflight request
+      x-google-backend:
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/testBudget
+definitions:
+  OptimizationData:
+    type: object
+    required:
+    - revenue
+    - spend
+    properties:
+      spend:
+        type: number
+        format: double
+        description: dollar value of target total ad spend
+      revenue:
+        type: number
+        format: double
+        description: dollar value of target revenue
+      aov:
+        type: number
+        format: double
+        description: average order value
+      cogs:
+        type: number
+        format: double
+        description: the average cost of goods sold per order
+      contributionMargin:
+        type: number
+        format: double
+        description: dollar value of the resultant contribution margin given fees
+      grossMargin:
+        type: number
+        format: double
+        description: the dollar value of the gross margin given fees
+      scalePct:
+        type: number
+        format: double
+        description: the percentage change in target ad spend from previous period
+      roas:
+        type: number
+        format: double
+        description: the target return on ad spend
+      breakevenRoas:
+        type: number
+        format: double
+        description: the return on ad spend required for break even given all other variables are fixed
+      roasPctDifference:
+        type: number
+        format: double
+        description: the percentage difference between the target return on ad spend and the breakeven return on ad spend
+      purchases:
+        type: number
+        format: double
+        description: total target purchases
+      totalCogs:
+        type: number
+        format: double
+        description: total dollar value of the cost to produce the sold goods
+      cpa:
+        type: number
+        format: double
+        description: the target cost per acquisition
+      fee:
+        type: number
+        format: double
+        description: the fixed fee applied to the given time span
+      pctFee:
+        type: number
+        format: double
+        description: a variable fee derived from total revenue or spend for the given time span
+    title: OptimizationData
+    description: The resulting dataset of an optimized marketing model
+  OptParams:
+    type: object
+    properties:
+      initialSpend:
+        type: number
+        format: double
+        description: The dollar value of spend during the initial period
+        minimum: 0
+        exclusiveMinimum: true
+      initialRoas:
+        type: number
+        format: double
+        description: The ROAS attained during the initial period
+        minimum: 0
+        exclusiveMinimum: true
+      fee:
+        type: number
+        format: double
+        description: A fixed cost 'fee' applied to each period
+      pctFeeBasistFee:
+        type: number
+        format: double
+        description: A variable cost applied to each period
+        minimum: 0
+        maximum: 100
+        exclusiveMinimum: true
+      pctFeeBasis:
+        $ref: '#/definitions/PctFeeBasis'
+      attributionLoss:
+        type: number
+        format: double
+        description: Estimated percentage loss of revenue due to attribution
+        minimum: 0
+        maximum: 100
+        exclusiveMinimum: true
+      timeSpans:
+        type: array
+        items:
+          $ref: '#/definitions/OptParamsTimeSpans'
+    title: OptimizationParameters
+    description: A set of parameters to use when building a model
+  OptResults:
+    type: object
+    properties:
+      timeSpans:
+        type: array
+        items:
+          $ref: '#/definitions/OptimizationData'
+      totals:
+        type: array
+        items:
+          $ref: '#/definitions/OptimizationData'
+    title: OptimizationResults/ModelData
+    description: Output of the optimization
+  TestBudgetParams:
+    type: object
+    properties:
+      campaignSpend:
+        type: number
+        format: double
+        description: "Total amount of ad spend in {nDays}."
+        minimum: 0
+        exclusiveMinimum: true
+      campaignDailyBudget:
+        type: number
+        format: double
+        description: Daily total amount of ad spend budgeted for campaign.
+        minimum: 0
+        exclusiveMinimum: true
+      testAdDailyBudget:
+        type: number
+        format: double
+        description: Daily total amount of ad spend budgeted for a test ad.
+        minimum: 0
+        exclusiveMinimum: true
+      nDays:
+        type: number
+        format: double
+        description: number of days the campaign has so far this month.
+        minimum: 0
+        maximum: 31
+        exclusiveMinimum: true
+      campaignPurchases:
+        type: number
+        format: double
+        description: Total number of purchases gained in campaign so far this month.
+        minimum: 0
+      CPATarget:
+        type: number
+        format: double
+        description: The goal cost per acquisition.
+        minimum: 0
+        exclusiveMinimum: true
+      daysLeft:
+        type: number
+        format: double
+        description: How many days left in the month.
+        minimum: 0
+        maximum: 31
+        exclusiveMinimum: true
+    title: TestBudgetResults
+    description: Resulting data after running the test budget calculator
+  TestBudgetResults:
+    type: object
+    properties:
+      testBudget:
+        type: number
+        format: double
+        description: "The total amount allocation for test budget during {daysLeft}"
+        minimum: 0
+      testCPA:
+        type: number
+        format: double
+        description: The required CPA for test ads with budget allocation as given in testBudget field
+      nonTestCPA:
+        type: number
+        format: double
+        description: The required CPA for non test ads with budget allocation as given in testBudget field
+      numberAds:
+        type: number
+        format: double
+        description: The estimated number of test ads that may be launched
+        minimum: 0
+    title: TestBudgetResults
+    description: Resulting data after running the test budget calculator
+  CreateUser:
+    type: object
+    required:
+    - email
+    - password
+    properties:
+      uid:
+        type: string
+        description: "The uid to assign to the newly created user. Must be a string between 1 and 128 characters long, inclusive. If not provided, a random uid will be automatically generated."
+        minLength: 1
+        maxLength: 128
+      email:
+        type: string
+        description: A user's email address. Must be a valid email address.
+      emailVerified:
+        type: boolean
+        description: "Whether or not the user's primary email is verified. If not provided, the default is false."
+      phoneNumber:
+        type: string
+        description: The user's primary phone number. Must be a valid E.164 spec compliant phone number.
+        minLength: 10
+        maxLength: 20
+      password:
+        type: string
+        description: "The user's raw, unhashed password. Must be at least six characters long."
+        minLength: 8
+        maxLength: 20
+      displayName:
+        type: string
+        description: A user's display name.
+        maxLength: 16
+      photoURL:
+        type: string
+        description: The URL for a user's photo.
+      disabled:
+        type: boolean
+        description: "Whether or not the user is disabled. true for disabled; false for enabled. If not provided, the default is false."
+    title: CreateUser
+    description: Register a new user into the database.
+  DefaultError:
+    type: object
+    properties:
+      timestamp:
+        type: string
+        description: UTC timestamp of error
+      status:
+        type: string
+        description: Error status code
+      error:
+        type: string
+        description: Error identifier
+      message:
+        type: string
+        description: Human readable and displayable text
+      devMessage:
+        type: string
+        description: Developer friendly error message
+      help:
+        type: string
+        description: URL for additional help and documentation on error
+      instance:
+        type: string
+    title: Defaulterrorresponse
+  OptParamsTimeSpans:
+    type: object
+    properties:
+      objective:
+        $ref: '#/definitions/Objective'
+      descaleLimit:
+        type: number
+        format: double
+        description: A limit imposed on the percentage of descale suggested by the model
+        minimum: 0
+        maximum: 50
+      lossThreshold:
+        type: number
+        format: double
+        description: Adjustment from 0 when root finding for maxRevenue objective
+      improvementFactor:
+        type: number
+        format: double
+        description: A percentage increase to sales volume
+        minimum: 0
+        maximum: 100
+      seasonalityFactor:
+        type: number
+        format: double
+        description: A percentage increase to sales volume
+        minimum: 0
+        maximum: 100
+      negativeSeasonalityFactor:
+        type: number
+        format: double
+        description: A percentage increase to sales volume
+        minimum: 0
+        maximum: 100
+      aov:
+        type: number
+        format: double
+        description: The average order value over a period
+        minimum: 0
+        exclusiveMinimum: true
+      cogs:
+        type: number
+        format: double
+        description: The average cost of goods sold over a period
+        minimum: 0
+        exclusiveMinimum: true
+    title: OptimizationParams_TimeSpans
+  Objective:
+    type: string
+    title: Objective
+    description: The objective function to be performed
+    enum:
+    - maxRevenue
+    - maxContributionMargin
+  PctFeeBasis:
+    type: string
+    title: PctFeeBasis
+    description: Specification of percent fee (revenue/spend)
+    enum:
+    - revenue
+    - spend
