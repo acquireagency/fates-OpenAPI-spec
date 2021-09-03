@@ -21,8 +21,6 @@ paths:
       - optimize
       summary: Perform model optimization
       operationId: post_optimize
-      x-google-backend:
-        address: https://fates-api-lqbezgosoq-uc.a.run.app/optimize
       parameters:
       - in: body
         name: payload
@@ -38,8 +36,6 @@ paths:
           description: Validation Error
           schema:
             $ref: '#/definitions/DefaultError'
-<<<<<<< HEAD
-=======
       x-google-backend:
         address: https://fates-api-lqbezgosoq-uc.a.run.app/optimize
     options:
@@ -53,14 +49,11 @@ paths:
           description: Success
       x-google-backend:
         address: https://fates-api-lqbezgosoq-uc.a.run.app/optimize
->>>>>>> 0a6253e678a20fa25a4e9d8da0cfe649f4eae25a
   /testBudget:
     post:
       tags:
       - testBudget
       operationId: post_test_budget
-      x-google-backend:
-        address: https://fates-api-lqbezgosoq-uc.a.run.app/testBudget
       parameters:
       - in: body
         name: payload
