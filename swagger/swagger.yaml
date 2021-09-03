@@ -15,12 +15,14 @@ consumes:
 produces:
 - application/json
 paths:
-  /optimize/:
+  /optimize:
     post:
       tags:
       - optimize
       summary: Perform model optimization
       operationId: post_optimize
+      x-google-backend:
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/optimize
       parameters:
       - in: body
         name: payload
@@ -36,11 +38,13 @@ paths:
           description: BAD REQUEST
           schema:
             $ref: '#/definitions/DefaultError'
-  /testBudget/:
+  /testBudget:
     post:
       tags:
       - testBudget
       operationId: post_test_budget
+      x-google-backend:
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/testBudget
       parameters:
       - in: body
         name: payload
