@@ -37,7 +37,7 @@ paths:
           schema:
             $ref: '#/definitions/DefaultError'
       x-google-backend:
-        address: https://fates-api-lqbezgosoq-uc.a.run.app/optimize
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/optimize
     options:
       tags:
       - optimize
@@ -48,7 +48,7 @@ paths:
         "200":
           description: Success
       x-google-backend:
-        address: https://fates-api-lqbezgosoq-uc.a.run.app/optimize
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/optimize
   /testBudget:
     post:
       tags:
@@ -70,7 +70,7 @@ paths:
           schema:
             $ref: '#/definitions/DefaultError'
       x-google-backend:
-        address: https://fates-api-lqbezgosoq-uc.a.run.app/testBudget
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/testBudget
     options:
       tags:
       - testBudget
@@ -81,7 +81,7 @@ paths:
         "200":
           description: Success
       x-google-backend:
-        address: https://fates-api-lqbezgosoq-uc.a.run.app/testBudget
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/testBudget
 definitions:
   OptParams:
     type: object
