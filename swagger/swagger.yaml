@@ -15,7 +15,7 @@ consumes:
 produces:
 - application/json
 paths:
-  /optimize/:
+  /optimize:
     post:
       tags:
       - optimize
@@ -33,10 +33,23 @@ paths:
           schema:
             $ref: '#/definitions/OptResults'
         "400":
-          description: BAD REQUEST
+          description: Validation Error
           schema:
             $ref: '#/definitions/DefaultError'
-  /testBudget/:
+      x-google-backend:
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/optimize
+    options:
+      tags:
+      - optimize
+      summary: Respond to a preflight request
+      operationId: options_optimize
+      parameters: []
+      responses:
+        "200":
+          description: Success
+      x-google-backend:
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/optimize
+  /testBudget:
     post:
       tags:
       - testBudget
@@ -56,6 +69,19 @@ paths:
           description: BAD REQUEST
           schema:
             $ref: '#/definitions/DefaultError'
+      x-google-backend:
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/testBudget
+    options:
+      tags:
+      - testBudget
+      summary: Respond to a preflight request
+      operationId: options_test_budget
+      parameters: []
+      responses:
+        "200":
+          description: Success
+      x-google-backend:
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/testBudget
 definitions:
   OptParams:
     type: object
