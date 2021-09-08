@@ -1,19 +1,32 @@
 ---
 swagger: "2.0"
 info:
-  description: Backend API for The Fates optimization tools
+  description: The Fates API contains a collection of tools for marketing optimization and analysis.
   version: 1.0.0
-  title: Fates API
+  title: The Fates API
+  termsOfService: https://www.fates.ai/terms-and-conditions
+  contact:
+    email: derek@acquireagency.com
+host: api.fates.ai
 basePath: /v1
 tags:
 - name: optimize
   description: Marketing model optimization
 - name: testBudget
-  description: Test budget calculator
-consumes:
-- application/json
-produces:
-- application/json
+  description: Test budget calculations
+- name: auth
+  description: Operations for user authentication
+  externalDocs:
+    description: Find out more about firebase auth
+    url: https://firebase.google.com/docs/auth
+- name: sessionLogin
+  description: Generate session cookie
+  externalDocs:
+    description: Find out more about managing session cookies
+    url: https://firebase.google.com/docs/auth/admin/manage-cookies
+schemes:
+- https
+- http
 paths:
   /optimize:
     post:
@@ -82,6 +95,103 @@ paths:
           description: Success
       x-google-backend:
         address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/testBudget
+  /auth:
+    get:
+      tags:
+      - auth
+      summary: Obtain a user resource by email or uid
+      operationId: get_auth
+      parameters:
+      - name: uid or email
+        in: query
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/User'
+      x-google-backend:
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/auth"
+    post:
+      tags:
+      - auth
+      summary: Register a new user to database
+      operationId: post_auth
+      parameters:
+      - in: body
+        name: user registration data
+        required: true
+        schema:
+          $ref: '#/definitions/CreateUser'
+      responses:
+        "201":
+          description: Created
+      x-google-backend:
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/auth
+    delete:
+      tags:
+      - auth
+      summary: Delete a user from the database
+      operationId: delete_auth
+      parameters:
+      - name: uid
+        in: query
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Deleted
+        "404":
+          description: User not found
+        "403":
+          description: Insufficient privelages
+    options:
+      tags:
+      - auth
+      summary: Respond to a preflight request
+      operationId: options_auth
+      parameters: []
+      responses:
+        "200":
+          description: Success
+      x-google-backend:
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/testBudget
+    patch:
+      tags:
+      - auth
+      summary: Change a user's email or password
+      operationId: patch_auth
+      parameters:
+      - in: body
+        name: update user data
+        required: false
+        schema:
+          $ref: '#/definitions/CreateUser'
+      responses:
+        "200":
+          description: Updated
+      x-google-backend:
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/auth
+  /sessionLogin:
+    post:
+      tags:
+      - sessionLogin
+      summary: Log in a user
+      operationId: post_sessionLogin
+      parameters:
+      - in: body
+        name: ID Token
+        required: false
+        schema:
+          $ref: '#/definitions/SessionLogin'
+      responses:
+        "200":
+          description: Success
+        "401":
+          description: Could not authenticate
+        "404":
+          description: User not found
 definitions:
   OptParams:
     type: object
@@ -331,8 +441,89 @@ definitions:
         type: integer
         example: 4
         description: The estimated number of test ads that may be launched
-responses:
-  ParseError:
-    description: When a mask can't be parsed
-  MaskError:
-    description: When any error occurs on mask
+  CreateUser:
+    type: object
+    required:
+    - email
+    - password
+    properties:
+      uid:
+        type: string
+        description: "The uid to assign to the newly created user. Must be a string between 1 and 128 characters long, inclusive. If not provided, a random uid will be automatically generated."
+        minLength: 1
+        maxLength: 128
+      email:
+        type: string
+        format: email
+        description: A user's email address. Must be a valid email address.
+      emailVerified:
+        type: boolean
+        description: "Whether or not the user's primary email is verified. If not provided, the default is false."
+      phoneNumber:
+        type: string
+        description: The user's primary phone number. Must be a valid E.164 spec compliant phone number.
+        minLength: 10
+        maxLength: 20
+      password:
+        type: string
+        description: "The user's raw, unhashed password. Must be at least six characters long."
+        minLength: 8
+        maxLength: 20
+      displayName:
+        type: string
+        description: A user's display name.
+        maxLength: 16
+      photoURL:
+        type: string
+        description: The URL for a user's photo.
+      disabled:
+        type: boolean
+        description: "Whether or not the user is disabled. true for disabled; false for enabled. If not provided, the default is false."
+    title: CreateUser
+    description: Register a new user into the database.
+  User:
+    type: object
+    properties:
+      createdAt:
+        type: string
+      email:
+        type: string
+      emailVerified:
+        type: boolean
+      lastLoginAt:
+        type: string
+      lastRefreshAt:
+        type: string
+      localId:
+        type: string
+      passwordHash:
+        type: string
+      passwordUpdatedAt:
+        type: integer
+        format: int64
+      providerUserInfo:
+        type: array
+        items:
+          type: object
+          properties:
+            email:
+              type: string
+            federatedId:
+              type: string
+            providerId:
+              type: string
+            rawId:
+              type: string
+      validSince:
+        type: string
+    title: User
+    description: User data
+  SessionLogin:
+    type: object
+    properties:
+      idToken:
+        type: string
+        minLength: 1
+        maxLength: 128
+    title: SessionLogin
+    description: Log in a user
