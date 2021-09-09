@@ -251,6 +251,20 @@
             "description" : "User not found"
           }
         }
+      },
+      "options" : {
+        "tags" : [ "auth" ],
+        "summary" : "Respond to a preflight request",
+        "operationId" : "options_session_login",
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "Success"
+          }
+        },
+        "x-google-backend" : {
+          "address" : "https://fates-api-lqbezgosoq-uc.a.run.app/v1/sessionLogin"
+        }
       }
     }
   },
