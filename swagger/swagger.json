@@ -253,7 +253,7 @@
         }
       },
       "options" : {
-        "tags" : [ "auth" ],
+        "tags" : [ "sessionLogin" ],
         "summary" : "Respond to a preflight request",
         "operationId" : "options_session_login",
         "parameters" : [ ],
