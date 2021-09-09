@@ -38,7 +38,7 @@
       "post" : {
         "tags" : [ "optimize" ],
         "summary" : "Perform model optimization",
-        "operationId" : "post_optimize",
+        "operationId" : "api.optimize.views.run_optimize",
         "parameters" : [ {
           "in" : "body",
           "name" : "payload",
@@ -68,7 +68,7 @@
       "options" : {
         "tags" : [ "optimize" ],
         "summary" : "Respond to a preflight request",
-        "operationId" : "options_optimize",
+        "operationId" : "api.optimize.views.options_run_optimize",
         "parameters" : [ ],
         "responses" : {
           "200" : {
@@ -83,7 +83,7 @@
     "/testBudget" : {
       "post" : {
         "tags" : [ "testBudget" ],
-        "operationId" : "post_test_budget",
+        "operationId" : "api.testBudget.views.test_budget",
         "parameters" : [ {
           "in" : "body",
           "name" : "payload",
@@ -113,7 +113,7 @@
       "options" : {
         "tags" : [ "testBudget" ],
         "summary" : "Respond to a preflight request",
-        "operationId" : "options_test_budget",
+        "operationId" : "api.testBudget.views.options_test_budget",
         "parameters" : [ ],
         "responses" : {
           "200" : {
@@ -129,7 +129,7 @@
       "get" : {
         "tags" : [ "auth" ],
         "summary" : "Obtain a user resource by email or uid",
-        "operationId" : "get_auth",
+        "operationId" : "api.auth.views.get_user",
         "parameters" : [ {
           "name" : "uid or email",
           "in" : "query",
@@ -145,13 +145,13 @@
           }
         },
         "x-google-backend" : {
-          "address" : "https://fates-api-lqbezgosoq-uc.a.run.app/v1/auth\""
+          "address" : "https://fates-api-lqbezgosoq-uc.a.run.app/v1/auth"
         }
       },
       "post" : {
         "tags" : [ "auth" ],
         "summary" : "Register a new user to database",
-        "operationId" : "post_auth",
+        "operationId" : "api.auth.views.create_user",
         "parameters" : [ {
           "in" : "body",
           "name" : "user registration data",
@@ -172,7 +172,7 @@
       "delete" : {
         "tags" : [ "auth" ],
         "summary" : "Delete a user from the database",
-        "operationId" : "delete_auth",
+        "operationId" : "api.auth.views.delete_user",
         "parameters" : [ {
           "name" : "uid",
           "in" : "query",
@@ -194,7 +194,7 @@
       "options" : {
         "tags" : [ "auth" ],
         "summary" : "Respond to a preflight request",
-        "operationId" : "options_auth",
+        "operationId" : "api.auth.views.options_auth",
         "parameters" : [ ],
         "responses" : {
           "200" : {
@@ -208,7 +208,7 @@
       "patch" : {
         "tags" : [ "auth" ],
         "summary" : "Change a user's email or password",
-        "operationId" : "patch_auth",
+        "operationId" : "api.auth.views.update_user",
         "parameters" : [ {
           "in" : "body",
           "name" : "update user data",
@@ -231,7 +231,7 @@
       "post" : {
         "tags" : [ "sessionLogin" ],
         "summary" : "Log in a user",
-        "operationId" : "post_sessionLogin",
+        "operationId" : "api.sessionLogin.views.session_login",
         "parameters" : [ {
           "in" : "body",
           "name" : "ID Token",
@@ -255,7 +255,7 @@
       "options" : {
         "tags" : [ "sessionLogin" ],
         "summary" : "Respond to a preflight request",
-        "operationId" : "options_session_login",
+        "operationId" : "api.sessionLogin.views.options_session_login",
         "parameters" : [ ],
         "responses" : {
           "200" : {
