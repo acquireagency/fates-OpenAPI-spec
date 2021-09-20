@@ -1,0 +1,507 @@
+openapi: 3.0.0
+info:
+  title: The Fates API
+  description: The Fates API contains a collection of tools for marketing optimization
+    and analysis.
+  termsOfService: https://www.fates.ai/terms-and-conditions
+  contact:
+    email: derek@acquireagency.com
+  version: 1.0.1
+servers:
+- url: "https://api.fates.ai/{basePath}"
+  description: Production Server
+  variables:
+    basePath:
+      default: v1
+- url: "http://localhost:{port}/{basePath}"
+  description: Local testing server
+  variables:
+    port:
+      default: "5000"
+    basePath:
+      default: v1
+tags:
+- name: optimize
+  description: Marketing model optimization
+- name: testBudget
+  description: Test budget calculations
+paths:
+  /optimize:
+    post:
+      tags:
+      - optimize
+      summary: Optimize model
+      description: Perform an optimization using supplied parameters
+      operationId: api.optimize.views.run_optimize
+      requestBody:
+        $ref: '#/components/requestBodies/OptParams'
+      responses:
+        "200":
+          description: Successfully Optimized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OptResults'
+        "400":
+          description: Validation Error
+        "403":
+          description: Forbidden
+      x-google-backend:
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/optimize
+    options:
+      tags:
+      - optimize
+      summary: Respond to a preflight request
+      operationId: api.optimize.views.options_run_optimize
+      responses:
+        "200":
+          description: Success
+      x-google-backend:
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/optimize
+  /testBudget:
+    post:
+      tags:
+      - testBudget
+      summary: Calculate test budget
+      description: Perform calculation to determine test budget and other results
+      operationId: api.testBudget.views.test_budget
+      requestBody:
+        $ref: '#/components/requestBodies/TestBudgetParams'
+      responses:
+        "200":
+          description: Calculated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestBudgetResults'
+      x-google-backend:
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/testBudget
+    options:
+      tags:
+      - testBudget
+      summary: Respond to a preflight request
+      operationId: api.testBudget.views.options_test_budget
+      responses:
+        "200":
+          description: Success
+      x-google-backend:
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/testBudget
+  /killList:
+    post:
+      tags:
+      - killList
+      summary: Generate an ad kill list
+      description: Compute kill thresholds using ad data from Facebook
+      operationId: api.killList.views.kill_list
+      requestBody:
+        $ref: '#/components/requestBodies/FacebookAds'
+      responses:
+        "200":
+          description: Successfully generated kill list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KillList'
+        "400":
+          description: Validation Error
+        "403":
+          description: Forbidden
+      x-google-backend:
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/killList
+    options:
+      tags:
+      - killList
+      summary: Respond to a preflight request
+      operationId: api.killList.views.options_kill_list
+      responses:
+        "200":
+          description: Success
+      x-ggogle-backend:
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/killList
+components:
+  schemas:
+    OptimizationData:
+      required:
+      - aov
+      - breakevenRoas
+      - cogs
+      - contributionMargin
+      - cpa
+      - fee
+      - grossMargin
+      - pctFee
+      - purchases
+      - revenue
+      - roas
+      - scalePct
+      - spend
+      - totalCogs
+      type: object
+      properties:
+        spend:
+          type: number
+          description: The dollar value of target total ad spend
+          example: 5918
+        revenue:
+          type: number
+          description: The dollar amount of target revenue
+          example: 16289
+        aov:
+          type: number
+          description: Average order value
+          example: 50
+        cogs:
+          type: number
+          description: The average cost of goods sold per order
+          example: 10
+        contributionMargin:
+          type: number
+          description: The dollar value of the resulting contribution margin
+          example: 5961
+        grossMargin:
+          type: number
+          description: The dollar value of the gross margin
+          example: 4910
+        scalePct:
+          type: number
+          description: The percentage change in target ad spend from previous period
+          example: 18.37
+        roas:
+          type: number
+          description: The target return on ad spend
+          example: 2.75
+        breakevenRoas:
+          type: number
+          description: The return on ad spend required for break even given all other
+            variables are fixed
+          example: 1.43
+        purchases:
+          type: number
+          description: Total target purchases
+          example: 326
+        totalCogs:
+          type: number
+          description: Total dollar value of the cost to produce the goods sold
+          example: 3257
+        cpa:
+          type: number
+          description: The target cost per acquisition
+          example: 18
+        fee:
+          type: number
+          description: The fixed fee applied to the given time span
+          example: 500
+        pctFee:
+          type: number
+          description: The variable fee derived from total revenue or spend for the
+            given time span
+          example: 4
+    OptParamsTimeSpans:
+      type: object
+      properties:
+        objective:
+          type: string
+          description: Objective
+          example: maxContributionMargin
+          enum:
+          - maxRevenue
+          - maxContributionMargin
+        descaleLimit:
+          maximum: 50
+          minimum: 0
+          type: number
+          description: A limit imposed on the percentage of descale suggested by the
+            model
+          example: 20
+        lossThreshold:
+          type: number
+          description: Minimum desired contribution margin when optimizing on revenue
+        improvementFactor:
+          maximum: 1000
+          minimum: 0
+          type: number
+          description: A percentage increase to sales volume
+          example: 5
+        seasonalityFactor:
+          maximum: 100
+          minimum: 0
+          type: number
+          description: A percentage increase to sales volume
+          example: 25
+        negativeSeasonalityFactor:
+          maximum: 100
+          minimum: 0
+          type: number
+          description: A percentage decrease to sales volume
+        aov:
+          minimum: 0
+          exclusiveMinimum: true
+          type: number
+          description: The average order value over a period
+          example: 50
+        cogs:
+          minimum: 0
+          exclusiveMinimum: true
+          type: number
+          description: The average cost of goods sold over a period
+          example: 10
+    OptResults:
+      required:
+      - months
+      - totals
+      type: object
+      properties:
+        months:
+          type: array
+          items:
+            $ref: '#/components/schemas/OptimizationData'
+        totals:
+          $ref: '#/components/schemas/OptResults_totals'
+      description: Results of an optimization
+    TestBudgetResults:
+      type: object
+      properties:
+        testBudget:
+          type: number
+          description: "The total amount allocation for test budget during {daysLeft}"
+          example: 2050
+        testCPA:
+          type: number
+          description: The required CPA for test ads with budget allocation as given
+            in testBudget field
+          example: 300
+        nonTestCPA:
+          type: number
+          description: The required CPA for non test ads with budget allocation as
+            given in testBudget field
+          example: 181
+        numberAds:
+          type: integer
+          description: The estimated number of test ads that may be launched
+          example: 4
+      description: Results of a test budget calculation
+    KillList:
+      type: array
+      description: A list of ads with kill decision data
+      items:
+        $ref: '#/components/schemas/KillList_inner'
+    DefaultError:
+      required:
+      - error
+      - message
+      - status
+      - timestamp
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: UTC formatted timestamp of error
+          format: date-time
+        status:
+          maximum: 600
+          minimum: 100
+          type: integer
+          description: Error status code
+          example: 400
+        error:
+          type: string
+          description: Error identifier
+          example: InvalidAPIRequest
+        message:
+          type: string
+          description: User friendly error message
+          example: Uh oh! Something went wrong.
+        devMessage:
+          type: string
+          description: Developer friendly error message
+        help:
+          type: string
+          description: URL for additional help and documentation regarding error
+          example: See app.fates.ai/api/v1/docs/optimize
+    OptResults_totals:
+      type: object
+      properties:
+        schema:
+          $ref: '#/components/schemas/OptimizationData'
+    KillList_inner:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique ad identifier
+        name:
+          type: string
+          description: The unique ad name
+        spend:
+          minimum: 0
+          exclusiveMinimum: true
+          type: number
+          description: The dollar amount the ad has spent in its lifetime
+          example: 1000
+        cpa:
+          minimum: 0
+          exclusiveMinimum: true
+          type: number
+          description: The dollar cost per acquisition for the ad in its lifetime
+          example: 20
+        oddsRatio:
+          type: number
+          description: The calculated odds that the ad performs at or over its target
+          example: 11.8
+        suggestedStatus:
+          type: string
+          description: Decision indicator for whether to pause the ad or leave active
+          enum:
+          - pause
+          - active
+  responses:
+    GeneralError:
+      description: A general error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DefaultError'
+  requestBodies:
+    OptParams:
+      content:
+        application/json:
+          schema:
+            properties:
+              initialSpend:
+                minimum: 0
+                exclusiveMinimum: true
+                type: number
+                description: The dollar value of spend during the initial period
+                example: 5000
+              initialRoas:
+                minimum: 0
+                exclusiveMinimum: true
+                type: number
+                description: The ROAS attained during the initial period
+                example: 3
+              fee:
+                minimum: 0
+                type: number
+                description: A fixed cost fee applied to each period
+                example: 1000
+              pctFee:
+                minimum: 0
+                type: number
+                description: A variable cost applied to each period
+                example: 4
+              pctFeeBasis:
+                type: string
+                description: Specification of percent fee
+                example: revenue
+                enum:
+                - revenue
+                - spend
+              attributionLoss:
+                minimum: 0
+                exclusiveMinimum: true
+                type: number
+                description: Estimated percentage loss of revenue due to attribution
+              timeSpans:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OptParamsTimeSpans'
+      required: true
+    TestBudgetParams:
+      content:
+        application/json:
+          schema:
+            properties:
+              campaignSpend:
+                minimum: 0
+                exclusiveMinimum: true
+                type: number
+                description: Total amount of ad spend in nDays
+                example: 20000
+              campaignDailyBudget:
+                minimum: 0
+                exclusiveMinimum: true
+                type: number
+                description: Daily total amount of ad spend budgeted for campaign
+                example: 1500
+              testAdDailyBudget:
+                minimum: 0
+                exclusiveMinimum: true
+                type: number
+                description: Daily total amount of ad spend budgeted for a test ad
+                example: 100
+              nDays:
+                maximum: 30
+                minimum: 0
+                exclusiveMinimum: true
+                type: integer
+                description: Number of days the campaign has so far this month
+                example: 25
+              campaignPurchases:
+                minimum: 0
+                type: integer
+                description: Total number of purchases gained in campaign so far this
+                  month
+                example: 110
+              CPATarget:
+                minimum: 0
+                exclusiveMinimum: true
+                type: number
+                description: The goal cost per acquisition
+                example: 220
+              daysLeft:
+                maximum: 30
+                minimum: 0
+                exclusiveMinimum: true
+                type: integer
+                description: How many days are left in the month
+                example: 5
+      required: true
+    FacebookAds:
+      content:
+        application/json:
+          schema:
+            properties:
+              data:
+                type: array
+                description: Facebook ads data
+                items:
+                  properties:
+                    id:
+                      type: string
+                      description: The unique ad identifier
+                      example: "6257020051607"
+                    name:
+                      type: string
+                      description: The unique asset name
+                      example: PR_SimilarBrands_F_20-54_US+CA_ALL_ALL____
+                    dailyBudget:
+                      minimum: 0
+                      exclusiveMinimum: true
+                      type: number
+                      description: The dollar amount of budget for this asset
+                      example: 1200
+                    spend:
+                      minimum: 0
+                      exclusiveMinimum: true
+                      type: number
+                      description: The dollar amount the asset has spent in its lifetime
+                      example: 1000
+                    purchases:
+                      minimum: 0
+                      type: integer
+                      description: The total number of purchases attributed to the
+                        asset in its lifetime
+                      example: 10
+              targetCpa:
+                minimum: 0
+                exclusiveMinimum: true
+                type: number
+                description: The target cost per acquisition in dollars
+                example: 50
+              oddsThresh:
+                minimum: 0
+                exclusiveMinimum: true
+                type: number
+                description: Decision threshold for status field indicator
+                example: 10
+      required: true
