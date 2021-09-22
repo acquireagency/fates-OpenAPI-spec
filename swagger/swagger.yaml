@@ -25,6 +25,8 @@ tags:
   description: Marketing model optimization
 - name: testBudget
   description: Test budget calculations
+- name: Optimizations
+  description: Ad/AdSet optimizations
 paths:
   /optimize:
     post:
@@ -86,31 +88,31 @@ paths:
           description: Success
       x-google-backend:
         address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/testBudget
-  /killList:
+  /scaleDescaleList:
     post:
       tags:
-      - killList
-      summary: Generate an ad kill list
-      description: Compute kill thresholds using ad data from Facebook
-      operationId: api.killList.views.kill_list
+      - Optimizations
+      summary: Generate recommendations for ad set scale and descale
+      description: Compute odds ratios using ad set data from Facebook
+      operationId: api.scaleDescaleList.views.scale_descale_list
       requestBody:
-        $ref: '#/components/requestBodies/FacebookAds'
+        $ref: '#/components/requestBodies/Facebook'
       responses:
         "200":
-          description: Successfully generated kill list
+          description: Successfully generated list
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/KillList'
+                $ref: '#/components/schemas/scaleDescaleList'
         "400":
           description: Validation Error
         "403":
           description: Forbidden
       x-google-backend:
-        address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/killList
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/scaleDescaleList
     options:
       tags:
-      - killList
+      - Optimizations
       summary: Respond to a preflight request
       operationId: api.killList.views.options_kill_list
       responses:
@@ -280,11 +282,11 @@ components:
           description: The estimated number of test ads that may be launched
           example: 4
       description: Results of a test budget calculation
-    KillList:
+    scaleDescaleList:
       type: array
-      description: A list of ads with kill decision data
+      description: A list of ad sets with scale/descale recommendations
       items:
-        $ref: '#/components/schemas/KillList_inner'
+        $ref: '#/components/schemas/scaleDescaleList_inner'
     DefaultError:
       required:
       - error
@@ -323,37 +325,39 @@ components:
       properties:
         schema:
           $ref: '#/components/schemas/OptimizationData'
-    KillList_inner:
+    scaleDescaleList_inner:
       type: object
       properties:
         id:
           type: string
-          description: The unique ad identifier
+          description: The unique ad set identifier
         name:
           type: string
-          description: The unique ad name
+          description: The unique ad set name
         spend:
           minimum: 0
           exclusiveMinimum: true
           type: number
-          description: The dollar amount the ad has spent in its lifetime
+          description: The dollar amount the ad set has spent in its lifetime
           example: 1000
         cpa:
           minimum: 0
           exclusiveMinimum: true
           type: number
-          description: The dollar cost per acquisition for the ad in its lifetime
+          description: The dollar cost per acquisition for the ad set in its lifetime
           example: 20
         oddsRatio:
           type: number
-          description: The calculated odds that the ad performs at or over its target
+          description: The calculated odds that the ad set performs at or over its
+            target
           example: 11.8
         suggestedStatus:
           type: string
-          description: Decision indicator for whether to pause the ad or leave active
+          description: Decision indicator for the ad set budget
           enum:
-          - pause
-          - active
+          - scale
+          - descale
+          - none
   responses:
     GeneralError:
       description: A general error
@@ -456,7 +460,7 @@ components:
                 description: How many days are left in the month
                 example: 5
       required: true
-    FacebookAds:
+    Facebook:
       content:
         application/json:
           schema:
