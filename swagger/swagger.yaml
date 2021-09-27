@@ -27,6 +27,8 @@ tags:
   description: Test budget calculations
 - name: Optimizations
   description: Ad/AdSet optimizations
+- name: Facebook
+  description: Methods relating to Facebook's Graph API
 paths:
   /optimize:
     post:
@@ -120,6 +122,130 @@ paths:
           description: Success
       x-ggogle-backend:
         address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/killList
+  /facebook/{accountId}/insights:
+    get:
+      tags:
+      - Facebook
+      summary: Get Facebook Marketing data
+      description: Use integrated Facebook Graph API to fetch insights data
+      parameters:
+      - name: accountId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: act_\d+
+          type: string
+          example: act_123456789
+      - name: fields
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: "spend,impressions"
+      - name: level
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: adset
+          enum:
+          - campaign
+          - adset
+          - ad
+      - name: time_increment
+        in: query
+        description: How to break down the result.
+        required: false
+        style: form
+        explode: true
+        schema:
+          $ref: '#/components/schemas/time_increment'
+      - name: date_preset
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: last_30d
+          default: last_30d
+          enum:
+          - today
+          - yesterday
+          - this_month
+          - last_month
+          - this_quarter
+          - maximum
+          - last_3d
+          - last_7d
+          - last_14d
+          - last_28d
+          - last_30d
+          - last_90d
+          - last_week_mon_sun
+          - last_week_sun_sat
+          - last_quarter
+          - last_year
+          - this_week_mon_today
+          - this_week_sun_today
+          - this_year
+      - name: filtering
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          $ref: '#/components/schemas/Filtering'
+      - name: action_types
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          pattern: "[0-9a-zA-Z]+(,[0-9a-zA-Z]+)*"
+          type: string
+          example: "omni_purchase,omni_add_to_cart"
+      responses:
+        "200":
+          description: Success
+          content:
+            application-json:
+              schema:
+                $ref: '#/components/schemas/FacebookData'
+              examples:
+                ad_data:
+                  value:
+                    ad_name: PR_M/F_28-45_Sports
+                    ad_id: 123456789
+                    spend: 500
+                    omni_purchase: 10
+      x-google-backend:
+        address: "https://fates-api-lqbezgosoq-uc.a.run.app/v1/facebook/{accountId}/insights"
+    options:
+      tags:
+      - Facebook
+      summary: Reponse to a preflight request
+      operationId: api.facebook.views.options_insights
+      parameters:
+      - name: accountId
+        in: path
+        description: The unique account identifier
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Success
+      x-google-backend:
+        address: "https://fates-api-lqbezgosoq-uc.a.run.app/v1/facebook/{accountId}/insights"
 components:
   schemas:
     OptimizationData:
@@ -287,6 +413,31 @@ components:
       description: A list of ad sets with scale/descale recommendations
       items:
         $ref: '#/components/schemas/scaleDescaleList_inner'
+    Filtering:
+      type: array
+      items:
+        $ref: '#/components/schemas/Filtering_inner'
+    FilterValue1:
+      type: array
+      description: Used in conjunction with <IN> operator
+      items:
+        type: string
+        enum:
+        - ACTIVE
+        - PAUSED
+    FilterValue2:
+      type: string
+    FacebookData:
+      type: array
+      description: Facebook data in format of the Graph API data array
+      items:
+        type: object
+        additionalProperties:
+          oneOf:
+          - type: number
+          - type: integer
+          - type: string
+        description: A row of data with labels
     DefaultError:
       required:
       - error
@@ -320,6 +471,14 @@ components:
           type: string
           description: URL for additional help and documentation regarding error
           example: See app.fates.ai/api/v1/docs/optimize
+    time_increment:
+      oneOf:
+      - type: array
+        enum:
+        - monthly
+        - all_days
+      - type: integer
+        description: "If it is an integer, it is the number of days from 1 to 90."
     OptResults_totals:
       type: object
       properties:
@@ -358,6 +517,42 @@ components:
           - scale
           - descale
           - none
+    Filtering_inner:
+      type: object
+      properties:
+        field:
+          type: string
+          example: adset.effective_status
+        operator:
+          type: string
+          example: IN
+          enum:
+          - EQUAL
+          - NOT_EQUAL
+          - GREATER_THAN
+          - GREATER_THAN_OR_EQUAL
+          - LESS_THAN
+          - LESS_THAN_OR_EQUAL
+          - IN_RANGE
+          - NOT_IN_RANGE
+          - CONTAIN
+          - NOT_CONTAIN
+          - IN
+          - NOT_IN
+          - STARTS_WITH
+          - ENDS_WITH
+          - ANY
+          - ALL
+          - AFTER
+          - BEFORE
+          - ON_OR_AFTER
+          - ON_OR_BEFORE
+          - NONE
+        value:
+          oneOf:
+          - $ref: '#/components/schemas/FilterValue1'
+          - $ref: '#/components/schemas/FilterValue2'
+      description: a single filter condition
   responses:
     GeneralError:
       description: A general error
