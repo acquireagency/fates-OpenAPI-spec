@@ -90,44 +90,13 @@ paths:
           description: Success
       x-google-backend:
         address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/testBudget
-  /scaleDescaleList:
+  /scaleDescaleList/{accountId}:
     post:
       tags:
       - Optimizations
       summary: Generate recommendations for ad set scale and descale
       description: Compute odds ratios using ad set data from Facebook
       operationId: api.scaleDescaleList.views.scale_descale_list
-      requestBody:
-        $ref: '#/components/requestBodies/Facebook'
-      responses:
-        "200":
-          description: Successfully generated list
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/scaleDescaleList'
-        "400":
-          description: Validation Error
-        "403":
-          description: Forbidden
-      x-google-backend:
-        address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/scaleDescaleList
-    options:
-      tags:
-      - Optimizations
-      summary: Respond to a preflight request
-      operationId: api.killList.views.options_kill_list
-      responses:
-        "200":
-          description: Success
-      x-ggogle-backend:
-        address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/killList
-  /facebook/{accountId}/insights:
-    get:
-      tags:
-      - Facebook
-      summary: Get Facebook Marketing data
-      description: Use integrated Facebook Graph API to fetch insights data
       parameters:
       - name: accountId
         in: path
@@ -146,26 +115,6 @@ paths:
         schema:
           type: string
           example: "spend,impressions"
-      - name: level
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: string
-          example: adset
-          enum:
-          - campaign
-          - adset
-          - ad
-      - name: time_increment
-        in: query
-        description: How to break down the result.
-        required: false
-        style: form
-        explode: true
-        schema:
-          $ref: '#/components/schemas/time_increment'
       - name: date_preset
         in: query
         required: false
@@ -195,6 +144,18 @@ paths:
           - this_week_mon_today
           - this_week_sun_today
           - this_year
+      - name: level
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: adset
+          enum:
+          - campaign
+          - adset
+          - ad
       - name: filtering
         in: query
         required: false
@@ -202,6 +163,138 @@ paths:
         explode: true
         schema:
           $ref: '#/components/schemas/Filtering'
+      - name: time_increment
+        in: query
+        description: How to break down the result.
+        required: false
+        style: form
+        explode: true
+        schema:
+          $ref: '#/components/schemas/time_increment'
+      - name: action_types
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          pattern: "[0-9a-zA-Z]+(,[0-9a-zA-Z]+)*"
+          type: string
+          example: "omni_purchase,omni_add_to_cart"
+      requestBody:
+        $ref: '#/components/requestBodies/Facebook'
+      responses:
+        "200":
+          description: Successfully generated list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/scaleDescaleList'
+        "400":
+          description: Validation Error
+        "403":
+          description: Forbidden
+      x-google-backend:
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/scaleDescaleList
+    options:
+      tags:
+      - Optimizations
+      summary: Respond to a preflight request
+      operationId: api.killList.views.options_kill_list
+      parameters:
+      - name: accountId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: act_\d+
+          type: string
+          example: act_123456789
+      responses:
+        "200":
+          description: Success
+      x-ggogle-backend:
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/killList
+  /facebook/{accountId}/insights:
+    get:
+      tags:
+      - Facebook
+      summary: Get Facebook Marketing data
+      description: Use integrated Facebook Graph API to fetch insights data
+      parameters:
+      - name: accountId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: act_\d+
+          type: string
+          example: act_123456789
+      - name: fields
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: "spend,impressions"
+      - name: date_preset
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: last_30d
+          default: last_30d
+          enum:
+          - today
+          - yesterday
+          - this_month
+          - last_month
+          - this_quarter
+          - maximum
+          - last_3d
+          - last_7d
+          - last_14d
+          - last_28d
+          - last_30d
+          - last_90d
+          - last_week_mon_sun
+          - last_week_sun_sat
+          - last_quarter
+          - last_year
+          - this_week_mon_today
+          - this_week_sun_today
+          - this_year
+      - name: level
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: adset
+          enum:
+          - campaign
+          - adset
+          - ad
+      - name: filtering
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          $ref: '#/components/schemas/Filtering'
+      - name: time_increment
+        in: query
+        description: How to break down the result.
+        required: false
+        style: form
+        explode: true
+        schema:
+          $ref: '#/components/schemas/time_increment'
       - name: action_types
         in: query
         required: false
@@ -235,12 +328,13 @@ paths:
       parameters:
       - name: accountId
         in: path
-        description: The unique account identifier
         required: true
         style: simple
         explode: false
         schema:
+          pattern: act_\d+
           type: string
+          example: act_123456789
       responses:
         "200":
           description: Success
@@ -560,6 +654,96 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/DefaultError'
+  parameters:
+    AccountId:
+      name: accountId
+      in: path
+      required: true
+      style: simple
+      explode: false
+      schema:
+        pattern: act_\d+
+        type: string
+        example: act_123456789
+    Fields:
+      name: fields
+      in: query
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: string
+        example: "spend,impressions"
+    Level:
+      name: level
+      in: query
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: string
+        example: adset
+        enum:
+        - campaign
+        - adset
+        - ad
+    TimeIncrement:
+      name: time_increment
+      in: query
+      description: How to break down the result.
+      required: false
+      style: form
+      explode: true
+      schema:
+        $ref: '#/components/schemas/time_increment'
+    DatePreset:
+      name: date_preset
+      in: query
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: string
+        example: last_30d
+        default: last_30d
+        enum:
+        - today
+        - yesterday
+        - this_month
+        - last_month
+        - this_quarter
+        - maximum
+        - last_3d
+        - last_7d
+        - last_14d
+        - last_28d
+        - last_30d
+        - last_90d
+        - last_week_mon_sun
+        - last_week_sun_sat
+        - last_quarter
+        - last_year
+        - this_week_mon_today
+        - this_week_sun_today
+        - this_year
+    FilteringParam:
+      name: filtering
+      in: query
+      required: false
+      style: form
+      explode: true
+      schema:
+        $ref: '#/components/schemas/Filtering'
+    ActionTypes:
+      name: action_types
+      in: query
+      required: false
+      style: form
+      explode: true
+      schema:
+        pattern: "[0-9a-zA-Z]+(,[0-9a-zA-Z]+)*"
+        type: string
+        example: "omni_purchase,omni_add_to_cart"
   requestBodies:
     OptParams:
       content:
