@@ -91,7 +91,7 @@ paths:
       x-google-backend:
         address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/testBudget
   /scaleDescaleList/{accountId}:
-    post:
+    get:
       tags:
       - Optimizations
       summary: Generate recommendations for ad set scale and descale
@@ -113,6 +113,7 @@ paths:
         style: form
         explode: true
         schema:
+          pattern: "[0-9a-zA-Z]+(,[0-9a-zA-Z]+)*"
           type: string
           example: "spend,impressions"
       - name: date_preset
@@ -180,8 +181,28 @@ paths:
           pattern: "[0-9a-zA-Z]+(,[0-9a-zA-Z]+)*"
           type: string
           example: "omni_purchase,omni_add_to_cart"
-      requestBody:
-        $ref: '#/components/requestBodies/Facebook'
+      - name: targetCpa
+        in: query
+        description: The cost per acquisition target
+        required: false
+        style: form
+        explode: true
+        schema:
+          minimum: 0
+          exclusiveMinimum: true
+          type: number
+        example: 220
+      - name: oddsThresh
+        in: query
+        description: The odds ratio threshold for decisions
+        required: false
+        style: form
+        explode: true
+        schema:
+          minimum: 0
+          exclusiveMinimum: true
+          type: number
+        example: 10
       responses:
         "200":
           description: Successfully generated list
@@ -237,6 +258,7 @@ paths:
         style: form
         explode: true
         schema:
+          pattern: "[0-9a-zA-Z]+(,[0-9a-zA-Z]+)*"
           type: string
           example: "spend,impressions"
       - name: date_preset
@@ -304,6 +326,15 @@ paths:
           pattern: "[0-9a-zA-Z]+(,[0-9a-zA-Z]+)*"
           type: string
           example: "omni_purchase,omni_add_to_cart"
+      - name: attributes
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          pattern: "[0-9a-zA-Z]+(,[0-9a-zA-Z]+)*"
+          type: string
+          example: "daily_budget,objective"
       responses:
         "200":
           description: Success
@@ -672,6 +703,7 @@ components:
       style: form
       explode: true
       schema:
+        pattern: "[0-9a-zA-Z]+(,[0-9a-zA-Z]+)*"
         type: string
         example: "spend,impressions"
     Level:
@@ -744,6 +776,16 @@ components:
         pattern: "[0-9a-zA-Z]+(,[0-9a-zA-Z]+)*"
         type: string
         example: "omni_purchase,omni_add_to_cart"
+    Attributes:
+      name: attributes
+      in: query
+      required: false
+      style: form
+      explode: true
+      schema:
+        pattern: "[0-9a-zA-Z]+(,[0-9a-zA-Z]+)*"
+        type: string
+        example: "daily_budget,objective"
   requestBodies:
     OptParams:
       content:
