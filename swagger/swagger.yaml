@@ -106,7 +106,7 @@ paths:
         schema:
           pattern: act_\d+
           type: string
-          example: act_123456789
+          example: act_170293010980019
       - name: fields
         in: query
         required: false
@@ -115,7 +115,7 @@ paths:
         schema:
           pattern: "[0-9a-zA-Z]+(,[0-9a-zA-Z]+)*"
           type: string
-          example: "spend,impressions"
+          example: "spend,impressions,actions"
       - name: date_preset
         in: query
         required: false
@@ -215,7 +215,7 @@ paths:
         "403":
           description: Forbidden
       x-google-backend:
-        address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/scaleDescaleList
+        address: "https://fates-api-lqbezgosoq-uc.a.run.app/v1/scaleDescaleList/{accountId}"
     options:
       tags:
       - Optimizations
@@ -230,12 +230,12 @@ paths:
         schema:
           pattern: act_\d+
           type: string
-          example: act_123456789
+          example: act_170293010980019
       responses:
         "200":
           description: Success
       x-ggogle-backend:
-        address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/killList
+        address: "https://fates-api-lqbezgosoq-uc.a.run.app/v1/scaleDescaleList/{accountId}"
   /facebook/{accountId}/insights:
     get:
       tags:
@@ -251,7 +251,7 @@ paths:
         schema:
           pattern: act_\d+
           type: string
-          example: act_123456789
+          example: act_170293010980019
       - name: fields
         in: query
         required: false
@@ -260,7 +260,7 @@ paths:
         schema:
           pattern: "[0-9a-zA-Z]+(,[0-9a-zA-Z]+)*"
           type: string
-          example: "spend,impressions"
+          example: "spend,impressions,actions"
       - name: date_preset
         in: query
         required: false
@@ -335,6 +335,7 @@ paths:
           pattern: "[0-9a-zA-Z]+(,[0-9a-zA-Z]+)*"
           type: string
           example: "daily_budget,objective"
+          default: ""
       responses:
         "200":
           description: Success
@@ -365,7 +366,7 @@ paths:
         schema:
           pattern: act_\d+
           type: string
-          example: act_123456789
+          example: act_170293010980019
       responses:
         "200":
           description: Success
@@ -547,6 +548,7 @@ components:
       description: Used in conjunction with <IN> operator
       items:
         type: string
+        example: "[\"ACTIVE\"]"
         enum:
         - ACTIVE
         - PAUSED
@@ -604,6 +606,7 @@ components:
         - all_days
       - type: integer
         description: "If it is an integer, it is the number of days from 1 to 90."
+        example: 1
     OptResults_totals:
       type: object
       properties:
@@ -695,7 +698,7 @@ components:
       schema:
         pattern: act_\d+
         type: string
-        example: act_123456789
+        example: act_170293010980019
     Fields:
       name: fields
       in: query
@@ -705,7 +708,7 @@ components:
       schema:
         pattern: "[0-9a-zA-Z]+(,[0-9a-zA-Z]+)*"
         type: string
-        example: "spend,impressions"
+        example: "spend,impressions,actions"
     Level:
       name: level
       in: query
@@ -786,6 +789,7 @@ components:
         pattern: "[0-9a-zA-Z]+(,[0-9a-zA-Z]+)*"
         type: string
         example: "daily_budget,objective"
+        default: ""
   requestBodies:
     OptParams:
       content:
