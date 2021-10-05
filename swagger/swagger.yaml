@@ -1,25 +1,24 @@
 openapi: 3.0.0
 info:
   title: The Fates API
-  description: The Fates API contains a collection of tools for marketing optimization
-    and analysis.
+  version: 1.0.1
+  description: The Fates API contains a collection of tools for marketing optimization and analysis.
   termsOfService: https://www.fates.ai/terms-and-conditions
   contact:
     email: derek@acquireagency.com
-  version: 1.0.1
 servers:
-- url: "https://api.fates.ai/{basePath}"
-  description: Production Server
-  variables:
-    basePath:
-      default: v1
-- url: "http://localhost:{port}/{basePath}"
-  description: Local testing server
-  variables:
-    port:
-      default: "5000"
-    basePath:
-      default: v1
+  - url: https://api.fates.ai/{basePath}
+    description: Production Server
+    variables:
+      basePath:
+        default: v1
+  - url: http://localhost:{port}/{basePath}
+    description: Local testing server
+    variables:
+      port:
+        default: '5000'
+      basePath:
+        default: v1
 tags:
 - name: optimize
   description: Marketing model optimization
@@ -31,313 +30,152 @@ tags:
   description: Methods relating to Facebook's Graph API
 paths:
   /optimize:
+    options:
+      tags:
+        - optimize
+      summary: Respond to a preflight request
+      operationId: api.optimize.views.options_run_optimize
+      x-google-backend:
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/optimize
+      responses:
+        200:
+          description: Success
     post:
       tags:
       - optimize
       summary: Optimize model
       description: Perform an optimization using supplied parameters
       operationId: api.optimize.views.run_optimize
+      x-google-backend:
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/optimize
       requestBody:
         $ref: '#/components/requestBodies/OptParams'
       responses:
-        "200":
+        200:
           description: Successfully Optimized
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/OptResults'
-        "400":
+        400:
           description: Validation Error
-        "403":
+        403:
           description: Forbidden
-      x-google-backend:
-        address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/optimize
-    options:
-      tags:
-      - optimize
-      summary: Respond to a preflight request
-      operationId: api.optimize.views.options_run_optimize
-      responses:
-        "200":
-          description: Success
-      x-google-backend:
-        address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/optimize
   /testBudget:
-    post:
-      tags:
-      - testBudget
-      summary: Calculate test budget
-      description: Perform calculation to determine test budget and other results
-      operationId: api.testBudget.views.test_budget
-      requestBody:
-        $ref: '#/components/requestBodies/TestBudgetParams'
-      responses:
-        "200":
-          description: Calculated
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TestBudgetResults'
-      x-google-backend:
-        address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/testBudget
     options:
       tags:
       - testBudget
       summary: Respond to a preflight request
       operationId: api.testBudget.views.options_test_budget
-      responses:
-        "200":
-          description: Success
       x-google-backend:
         address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/testBudget
+      responses:
+        '200':
+          description: Success
+    post:
+      tags:
+        - testBudget
+      summary: Calculate test budget
+      description: Perform calculation to determine test budget and other results
+      operationId: api.testBudget.views.test_budget
+      x-google-backend:
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/testBudget
+      requestBody:
+        $ref: '#/components/requestBodies/TestBudgetParams'
+      responses:
+        200:
+          description: Calculated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestBudgetResults'
   /scaleDescaleList/{accountId}:
+    options:
+      tags:
+        - Optimizations
+      summary: Respond to a preflight request
+      operationId: api.killList.views.options_kill_list
+      x-ggogle-backend:
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/scaleDescaleList/{accountId}
+      parameters:
+        - $ref: '#/components/parameters/AccountId'
+      responses:
+        200:
+          description: Success
     get:
       tags:
-      - Optimizations
+        - Optimizations
       summary: Generate recommendations for ad set scale and descale
       description: Compute odds ratios using ad set data from Facebook
       operationId: api.scaleDescaleList.views.scale_descale_list
+      x-google-backend:
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/scaleDescaleList/{accountId}
       parameters:
-      - name: accountId
-        in: path
-        required: true
-        style: simple
-        explode: false
-        schema:
-          pattern: act_\d+
-          type: string
-          example: act_170293010980019
-      - name: fields
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          pattern: "[0-9a-zA-Z]+(,[0-9a-zA-Z]+)*"
-          type: string
-          example: "spend,impressions,actions"
-      - name: date_preset
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: string
-          example: last_30d
-          default: last_30d
-          enum:
-          - today
-          - yesterday
-          - this_month
-          - last_month
-          - this_quarter
-          - maximum
-          - last_3d
-          - last_7d
-          - last_14d
-          - last_28d
-          - last_30d
-          - last_90d
-          - last_week_mon_sun
-          - last_week_sun_sat
-          - last_quarter
-          - last_year
-          - this_week_mon_today
-          - this_week_sun_today
-          - this_year
-      - name: level
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: string
-          example: adset
-          enum:
-          - campaign
-          - adset
-          - ad
-      - name: filtering
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          $ref: '#/components/schemas/Filtering'
-      - name: time_increment
-        in: query
-        description: How to break down the result.
-        required: false
-        style: form
-        explode: true
-        schema:
-          $ref: '#/components/schemas/time_increment'
-      - name: action_types
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          pattern: "[0-9a-zA-Z]+(,[0-9a-zA-Z]+)*"
-          type: string
-          example: "omni_purchase,omni_add_to_cart"
-      - name: targetCpa
-        in: query
-        description: The cost per acquisition target
-        required: false
-        style: form
-        explode: true
-        schema:
-          minimum: 0
-          exclusiveMinimum: true
-          type: number
-        example: 220
-      - name: oddsThresh
-        in: query
-        description: The odds ratio threshold for decisions
-        required: false
-        style: form
-        explode: true
-        schema:
-          minimum: 0
-          exclusiveMinimum: true
-          type: number
-        example: 10
+        - $ref: '#/components/parameters/AccountId'
+        - $ref: '#/components/parameters/Fields'
+        - $ref: '#/components/parameters/DatePreset'
+        - $ref: '#/components/parameters/Level'
+        - $ref: '#/components/parameters/FilteringParam'
+        - $ref: '#/components/parameters/TimeIncrement'
+        - $ref: '#/components/parameters/ActionTypes'
+        - name: targetCpa
+          in: query
+          description: The cost per acquisition target
+          schema:
+            type: number
+            minimum: 0
+            exclusiveMinimum: true
+          example: 220
+        - name: oddsThresh
+          in: query
+          description: The odds ratio threshold for decisions
+          schema:
+            type: number
+            minimum: 0
+            exclusiveMinimum: true
+          example: 10
       responses:
-        "200":
+        200:
           description: Successfully generated list
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/scaleDescaleList'
-        "400":
+        400:
           description: Validation Error
-        "403":
+        403:
           description: Forbidden
-      x-google-backend:
-        address: "https://fates-api-lqbezgosoq-uc.a.run.app/v1/scaleDescaleList/{accountId}"
+  /facebook/{accountId}/insights:
     options:
       tags:
-      - Optimizations
-      summary: Respond to a preflight request
-      operationId: api.killList.views.options_kill_list
+        - Facebook
+      summary: Reponse to a preflight request
+      operationId: api.facebook.views.options_insights
+      x-google-backend:
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/facebook/{accountId}/insights
       parameters:
-      - name: accountId
-        in: path
-        required: true
-        style: simple
-        explode: false
-        schema:
-          pattern: act_\d+
-          type: string
-          example: act_170293010980019
+        - $ref: '#/components/parameters/AccountId'
       responses:
-        "200":
+        200:
           description: Success
-      x-ggogle-backend:
-        address: "https://fates-api-lqbezgosoq-uc.a.run.app/v1/scaleDescaleList/{accountId}"
-  /facebook/{accountId}/insights:
     get:
       tags:
-      - Facebook
+        - Facebook
       summary: Get Facebook Marketing data
       description: Use integrated Facebook Graph API to fetch insights data
+      x-google-backend:
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/facebook/{accountId}/insights
       parameters:
-      - name: accountId
-        in: path
-        required: true
-        style: simple
-        explode: false
-        schema:
-          pattern: act_\d+
-          type: string
-          example: act_170293010980019
-      - name: fields
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          pattern: "[0-9a-zA-Z]+(,[0-9a-zA-Z]+)*"
-          type: string
-          example: "spend,impressions,actions"
-      - name: date_preset
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: string
-          example: last_30d
-          default: last_30d
-          enum:
-          - today
-          - yesterday
-          - this_month
-          - last_month
-          - this_quarter
-          - maximum
-          - last_3d
-          - last_7d
-          - last_14d
-          - last_28d
-          - last_30d
-          - last_90d
-          - last_week_mon_sun
-          - last_week_sun_sat
-          - last_quarter
-          - last_year
-          - this_week_mon_today
-          - this_week_sun_today
-          - this_year
-      - name: level
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: string
-          example: adset
-          enum:
-          - campaign
-          - adset
-          - ad
-      - name: filtering
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          $ref: '#/components/schemas/Filtering'
-      - name: time_increment
-        in: query
-        description: How to break down the result.
-        required: false
-        style: form
-        explode: true
-        schema:
-          $ref: '#/components/schemas/time_increment'
-      - name: action_types
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          pattern: "[0-9a-zA-Z]+(,[0-9a-zA-Z]+)*"
-          type: string
-          example: "omni_purchase,omni_add_to_cart"
-      - name: attributes
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          pattern: "[0-9a-zA-Z]+(,[0-9a-zA-Z]+)*"
-          type: string
-          example: "daily_budget,objective"
-          default: ""
+        - $ref: '#/components/parameters/AccountId'
+        - $ref: '#/components/parameters/Fields'
+        - $ref: '#/components/parameters/DatePreset'
+        - $ref: '#/components/parameters/Level'
+        - $ref: '#/components/parameters/FilteringParam'
+        - $ref: '#/components/parameters/TimeIncrement'
+        - $ref: '#/components/parameters/ActionTypes'
+        - $ref: '#/components/parameters/Attributes'
       responses:
-        "200":
+        200:
           description: Success
           content:
             application-json:
@@ -346,50 +184,28 @@ paths:
               examples:
                 ad_data:
                   value:
-                    ad_name: PR_M/F_28-45_Sports
+                    ad_name: 'PR_M/F_28-45_Sports'
                     ad_id: 123456789
                     spend: 500
                     omni_purchase: 10
-      x-google-backend:
-        address: "https://fates-api-lqbezgosoq-uc.a.run.app/v1/facebook/{accountId}/insights"
-    options:
-      tags:
-      - Facebook
-      summary: Reponse to a preflight request
-      operationId: api.facebook.views.options_insights
-      parameters:
-      - name: accountId
-        in: path
-        required: true
-        style: simple
-        explode: false
-        schema:
-          pattern: act_\d+
-          type: string
-          example: act_170293010980019
-      responses:
-        "200":
-          description: Success
-      x-google-backend:
-        address: "https://fates-api-lqbezgosoq-uc.a.run.app/v1/facebook/{accountId}/insights"
 components:
   schemas:
     OptimizationData:
       required:
+      - spend
+      - revenue
       - aov
-      - breakevenRoas
       - cogs
       - contributionMargin
+      - grossMargin
+      - scalePct
+      - roas
+      - breakevenRoas
+      - purchases
+      - totalCogs
       - cpa
       - fee
-      - grossMargin
       - pctFee
-      - purchases
-      - revenue
-      - roas
-      - scalePct
-      - spend
-      - totalCogs
       type: object
       properties:
         spend:
@@ -426,8 +242,7 @@ components:
           example: 2.75
         breakevenRoas:
           type: number
-          description: The return on ad spend required for break even given all other
-            variables are fixed
+          description: The return on ad spend required for break even given all other variables are fixed
           example: 1.43
         purchases:
           type: number
@@ -447,8 +262,7 @@ components:
           example: 500
         pctFee:
           type: number
-          description: The variable fee derived from total revenue or spend for the
-            given time span
+          description: The variable fee derived from total revenue or spend for the given time span
           example: 4
     OptParamsTimeSpans:
       type: object
@@ -458,100 +272,164 @@ components:
           description: Objective
           example: maxContributionMargin
           enum:
-          - maxRevenue
-          - maxContributionMargin
+            - maxRevenue
+            - maxContributionMargin
         descaleLimit:
-          maximum: 50
-          minimum: 0
           type: number
-          description: A limit imposed on the percentage of descale suggested by the
-            model
+          description: A limit imposed on the percentage of descale suggested by the model
           example: 20
+          minimum: 0
+          maximum: 50
         lossThreshold:
           type: number
           description: Minimum desired contribution margin when optimizing on revenue
         improvementFactor:
-          maximum: 1000
-          minimum: 0
           type: number
           description: A percentage increase to sales volume
           example: 5
-        seasonalityFactor:
-          maximum: 100
           minimum: 0
+          maximum: 1000
+        seasonalityFactor:
           type: number
           description: A percentage increase to sales volume
           example: 25
-        negativeSeasonalityFactor:
-          maximum: 100
           minimum: 0
+          maximum: 100
+        negativeSeasonalityFactor:
           type: number
           description: A percentage decrease to sales volume
-        aov:
           minimum: 0
-          exclusiveMinimum: true
+          maximum: 100
+        aov:
           type: number
           description: The average order value over a period
           example: 50
-        cogs:
           minimum: 0
           exclusiveMinimum: true
+        cogs:
           type: number
           description: The average cost of goods sold over a period
           example: 10
+          minimum: 0
+          exclusiveMinimum: true
     OptResults:
-      required:
-      - months
-      - totals
-      type: object
-      properties:
-        months:
-          type: array
-          items:
-            $ref: '#/components/schemas/OptimizationData'
-        totals:
-          $ref: '#/components/schemas/OptResults_totals'
-      description: Results of an optimization
+        description: Results of an optimization
+        required:
+        - months
+        - totals
+        type: object
+        properties:
+          months:
+            type: array
+            items:
+              $ref: '#/components/schemas/OptimizationData'
+          totals:
+            type: object
+            properties:
+              schema:
+                $ref: '#/components/schemas/OptimizationData'
     TestBudgetResults:
+      description: Results of a test budget calculation
       type: object
       properties:
         testBudget:
           type: number
-          description: "The total amount allocation for test budget during {daysLeft}"
+          description: The total amount allocation for test budget during {daysLeft}
           example: 2050
         testCPA:
           type: number
-          description: The required CPA for test ads with budget allocation as given
-            in testBudget field
+          description: The required CPA for test ads with budget allocation as given in testBudget field
           example: 300
         nonTestCPA:
           type: number
-          description: The required CPA for non test ads with budget allocation as
-            given in testBudget field
+          description: The required CPA for non test ads with budget allocation as given in testBudget field
           example: 181
         numberAds:
           type: integer
           description: The estimated number of test ads that may be launched
           example: 4
-      description: Results of a test budget calculation
     scaleDescaleList:
-      type: array
       description: A list of ad sets with scale/descale recommendations
+      type: array
       items:
-        $ref: '#/components/schemas/scaleDescaleList_inner'
+        type: object
+        properties:
+          id:
+            type: string
+            description: The unique ad set identifier
+          name:
+            type: string
+            description: The unique ad set name
+          spend:
+            type: number
+            description: The dollar amount the ad set has spent in its lifetime
+            minimum: 0
+            exclusiveMinimum: true
+            example: 1000 
+          cpa:
+            type: number
+            description: The dollar cost per acquisition for the ad set in its lifetime
+            minimum: 0
+            exclusiveMinimum: true
+            example: 20
+          oddsRatio:
+            type: number
+            description: The calculated odds that the ad set performs at or over its target
+            example: 11.8
+          suggestedStatus:
+            type: string
+            description: Decision indicator for the ad set budget
+            enum:
+              - scale
+              - descale
+              - none
     Filtering:
       type: array
       items:
-        $ref: '#/components/schemas/Filtering_inner'
+        description: a single filter condition
+        type: object
+        properties:
+          field:
+            type: string
+            example: adset.effective_status
+          operator:
+            type: string
+            enum:
+            - EQUAL
+            - NOT_EQUAL
+            - GREATER_THAN
+            - GREATER_THAN_OR_EQUAL
+            - LESS_THAN
+            - LESS_THAN_OR_EQUAL
+            - IN_RANGE
+            - NOT_IN_RANGE
+            - CONTAIN
+            - NOT_CONTAIN
+            - IN
+            - NOT_IN
+            - STARTS_WITH
+            - ENDS_WITH
+            - ANY
+            - ALL
+            - AFTER
+            - BEFORE
+            - ON_OR_AFTER
+            - ON_OR_BEFORE
+            - NONE
+            example: IN
+          value:
+            oneOf:
+            - $ref: '#/components/schemas/FilterValue1'
+            - $ref: '#/components/schemas/FilterValue2'
     FilterValue1:
       type: array
       description: Used in conjunction with <IN> operator
       items:
         type: string
-        example: ACTIVE
         enum:
         - ACTIVE
         - PAUSED
+        example: 'ACTIVE'
     FilterValue2:
       type: string
     FacebookData:
@@ -559,29 +437,29 @@ components:
       description: Facebook data in format of the Graph API data array
       items:
         type: object
+        description: A row of data with labels
         additionalProperties:
           oneOf:
-          - type: number
-          - type: integer
-          - type: string
-        description: A row of data with labels
+            - type: number
+            - type: integer
+            - type: string
     DefaultError:
       required:
+      - timestamp
+      - status
       - error
       - message
-      - status
-      - timestamp
       type: object
       properties:
         timestamp:
           type: string
-          description: UTC formatted timestamp of error
           format: date-time
+          description: UTC formatted timestamp of error
         status:
-          maximum: 600
-          minimum: 100
           type: integer
           description: Error status code
+          maximum: 600
+          minimum: 100
           example: 400
         error:
           type: string
@@ -598,124 +476,169 @@ components:
           type: string
           description: URL for additional help and documentation regarding error
           example: See app.fates.ai/api/v1/docs/optimize
-    time_increment:
-      oneOf:
-      - type: string
-        default: all_days
-        enum:
-        - monthly
-        - all_days
-      - type: integer
-        description: "If it is an integer, it is the number of days from 1 to 90."
-        example: 1
-    OptResults_totals:
-      type: object
-      properties:
-        schema:
-          $ref: '#/components/schemas/OptimizationData'
-    scaleDescaleList_inner:
-      type: object
-      properties:
-        id:
-          type: string
-          description: The unique ad set identifier
-        name:
-          type: string
-          description: The unique ad set name
-        spend:
-          minimum: 0
-          exclusiveMinimum: true
-          type: number
-          description: The dollar amount the ad set has spent in its lifetime
-          example: 1000
-        cpa:
-          minimum: 0
-          exclusiveMinimum: true
-          type: number
-          description: The dollar cost per acquisition for the ad set in its lifetime
-          example: 20
-        oddsRatio:
-          type: number
-          description: The calculated odds that the ad set performs at or over its
-            target
-          example: 11.8
-        suggestedStatus:
-          type: string
-          description: Decision indicator for the ad set budget
-          enum:
-          - scale
-          - descale
-          - none
-    Filtering_inner:
-      type: object
-      properties:
-        field:
-          type: string
-          example: adset.effective_status
-        operator:
-          type: string
-          example: IN
-          enum:
-          - EQUAL
-          - NOT_EQUAL
-          - GREATER_THAN
-          - GREATER_THAN_OR_EQUAL
-          - LESS_THAN
-          - LESS_THAN_OR_EQUAL
-          - IN_RANGE
-          - NOT_IN_RANGE
-          - CONTAIN
-          - NOT_CONTAIN
-          - IN
-          - NOT_IN
-          - STARTS_WITH
-          - ENDS_WITH
-          - ANY
-          - ALL
-          - AFTER
-          - BEFORE
-          - ON_OR_AFTER
-          - ON_OR_BEFORE
-          - NONE
-        value:
-          oneOf:
-          - $ref: '#/components/schemas/FilterValue1'
-          - $ref: '#/components/schemas/FilterValue2'
-      description: a single filter condition
-  responses:
-    GeneralError:
-      description: A general error
+  requestBodies:
+    OptParams:
+      required: true
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/DefaultError'
+            properties:
+              initialSpend:
+                type: number
+                description: The dollar value of spend during the initial period
+                example: 5000
+                minimum: 0
+                exclusiveMinimum: true
+              initialRoas:
+                type: number
+                description: The ROAS attained during the initial period
+                example: 3
+                minimum: 0
+                exclusiveMinimum: true
+              fee:
+                type: number
+                description: A fixed cost fee applied to each period
+                example: 1000
+                minimum: 0
+              pctFee:
+                type: number
+                description: A variable cost applied to each period
+                example: 4
+                minimum: 0
+              pctFeeBasis:
+                type: string
+                description: Specification of percent fee
+                example: revenue
+                enum:
+                  - revenue
+                  - spend
+              attributionLoss:
+                type: number
+                description: Estimated percentage loss of revenue due to attribution
+                minimum: 0
+                exclusiveMinimum: true
+              timeSpans:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OptParamsTimeSpans'
+    TestBudgetParams:
+      required: true
+      content:
+        application/json:
+          schema:
+            properties:
+              campaignSpend:
+                type: number
+                description: Total amount of ad spend in nDays
+                example: 20000
+                minimum: 0
+                exclusiveMinimum: true
+              campaignDailyBudget:
+                type: number
+                description: Daily total amount of ad spend budgeted for campaign
+                example: 1500
+                minimum: 0
+                exclusiveMinimum: true
+              testAdDailyBudget:
+                type: number
+                description: Daily total amount of ad spend budgeted for a test ad
+                example: 100
+                minimum: 0
+                exclusiveMinimum: true
+              nDays:
+                type: integer
+                description: Number of days the campaign has so far this month
+                example: 25
+                minimum: 0
+                exclusiveMinimum: true
+                maximum: 30
+              campaignPurchases:
+                type: integer
+                description: Total number of purchases gained in campaign so far this month
+                example: 110
+                minimum: 0
+              CPATarget:
+                type: number
+                description: The goal cost per acquisition
+                example: 220
+                minimum: 0
+                exclusiveMinimum: true
+              daysLeft:
+                type: integer
+                description: How many days are left in the month
+                example: 5
+                minimum: 0
+                exclusiveMinimum: true
+                maximum: 30
+    Facebook:
+      required: true
+      content:
+        application/json:
+          schema:
+            properties:
+              data:
+                description: Facebook ads data
+                type: array
+                items:
+                  properties:
+                    id:
+                      type: string
+                      description: The unique ad identifier
+                      example: 6257020051607
+                    name:
+                      type: string
+                      description: The unique asset name
+                      example: 'PR_SimilarBrands_F_20-54_US+CA_ALL_ALL____'
+                    dailyBudget:
+                      type: number
+                      description: The dollar amount of budget for this asset
+                      minimum: 0
+                      exclusiveMinimum: true
+                      example: 1200
+                    spend:
+                      type: number
+                      description: The dollar amount the asset has spent in its lifetime
+                      minimum: 0
+                      exclusiveMinimum: true
+                      example: 1000
+                    purchases:
+                      type: integer
+                      description: The total number of purchases attributed to the asset in its lifetime
+                      minimum: 0
+                      example: 10
+              targetCpa:
+                type: number
+                description: The target cost per acquisition in dollars
+                minimum: 0
+                exclusiveMinimum: true
+                example: 50
+              oddsThresh:
+                type: number
+                description: Decision threshold for status field indicator
+                minimum: 0
+                exclusiveMinimum: true
+                example: 10
   parameters:
     AccountId:
-      name: accountId
       in: path
+      name: accountId
       required: true
-      style: simple
-      explode: false
       schema:
-        pattern: act_\d+
         type: string
-        example: act_170293010980019
+        pattern: 'act_\d+'
+        example: 'act_170293010980019'
     Fields:
+      in: query
       name: fields
-      in: query
       required: false
-      style: form
-      explode: true
       schema:
-        pattern: "[0-9a-zA-Z]+(,[0-9a-zA-Z]+)*"
         type: string
-        example: "spend,impressions,actions"
+        pattern: '[0-9a-zA-Z]+(,[0-9a-zA-Z]+)*'
+        example: 'spend,impressions,actions'
     Level:
-      name: level
       in: query
+      name: level
       required: false
-      style: form
-      explode: true
       schema:
         type: string
         example: adset
@@ -724,214 +647,56 @@ components:
         - adset
         - ad
     TimeIncrement:
+      in: query
       name: time_increment
-      in: query
+      required: false
       description: How to break down the result.
-      required: false
-      style: form
-      explode: true
       schema:
-        $ref: '#/components/schemas/time_increment'
+        oneOf:
+        - type: string
+          enum:
+          - monthly
+          - all_days
+          default: all_days
+        - type: integer
+          description: If it is an integer, it is the number of days from 1 to 90.
+          example: 1
     DatePreset:
-      name: date_preset
       in: query
+      name: date_preset
       required: false
-      style: form
-      explode: true
       schema:
         type: string
+        enum: [today, yesterday, this_month, last_month, this_quarter, maximum, last_3d, last_7d, last_14d, last_28d, last_30d, last_90d, last_week_mon_sun, last_week_sun_sat, last_quarter, last_year, this_week_mon_today, this_week_sun_today, this_year]
         example: last_30d
         default: last_30d
-        enum:
-        - today
-        - yesterday
-        - this_month
-        - last_month
-        - this_quarter
-        - maximum
-        - last_3d
-        - last_7d
-        - last_14d
-        - last_28d
-        - last_30d
-        - last_90d
-        - last_week_mon_sun
-        - last_week_sun_sat
-        - last_quarter
-        - last_year
-        - this_week_mon_today
-        - this_week_sun_today
-        - this_year
     FilteringParam:
-      name: filtering
       in: query
+      name: filtering
       required: false
-      style: form
-      explode: true
       schema:
         $ref: '#/components/schemas/Filtering'
     ActionTypes:
+      in: query
       name: action_types
-      in: query
       required: false
-      style: form
-      explode: true
       schema:
-        pattern: "[0-9a-zA-Z]+(,[0-9a-zA-Z]+)*"
         type: string
-        example: "omni_purchase,omni_add_to_cart"
+        pattern: '[0-9a-zA-Z]+(,[0-9a-zA-Z]+)*'
+        example: omni_purchase,omni_add_to_cart
     Attributes:
-      name: attributes
       in: query
+      name: attributes
       required: false
-      style: form
-      explode: true
       schema:
-        pattern: "[0-9a-zA-Z]+(,[0-9a-zA-Z]+)*"
         type: string
-        example: "daily_budget,objective"
-        default: ""
-  requestBodies:
-    OptParams:
+        pattern: '[0-9a-zA-Z]+(,[0-9a-zA-Z]+)*'
+        default: ''
+        example: 'daily_budget,objective'
+  responses:
+    GeneralError:
+      description: A general error
       content:
         application/json:
           schema:
-            properties:
-              initialSpend:
-                minimum: 0
-                exclusiveMinimum: true
-                type: number
-                description: The dollar value of spend during the initial period
-                example: 5000
-              initialRoas:
-                minimum: 0
-                exclusiveMinimum: true
-                type: number
-                description: The ROAS attained during the initial period
-                example: 3
-              fee:
-                minimum: 0
-                type: number
-                description: A fixed cost fee applied to each period
-                example: 1000
-              pctFee:
-                minimum: 0
-                type: number
-                description: A variable cost applied to each period
-                example: 4
-              pctFeeBasis:
-                type: string
-                description: Specification of percent fee
-                example: revenue
-                enum:
-                - revenue
-                - spend
-              attributionLoss:
-                minimum: 0
-                exclusiveMinimum: true
-                type: number
-                description: Estimated percentage loss of revenue due to attribution
-              timeSpans:
-                type: array
-                items:
-                  $ref: '#/components/schemas/OptParamsTimeSpans'
-      required: true
-    TestBudgetParams:
-      content:
-        application/json:
-          schema:
-            properties:
-              campaignSpend:
-                minimum: 0
-                exclusiveMinimum: true
-                type: number
-                description: Total amount of ad spend in nDays
-                example: 20000
-              campaignDailyBudget:
-                minimum: 0
-                exclusiveMinimum: true
-                type: number
-                description: Daily total amount of ad spend budgeted for campaign
-                example: 1500
-              testAdDailyBudget:
-                minimum: 0
-                exclusiveMinimum: true
-                type: number
-                description: Daily total amount of ad spend budgeted for a test ad
-                example: 100
-              nDays:
-                maximum: 30
-                minimum: 0
-                exclusiveMinimum: true
-                type: integer
-                description: Number of days the campaign has so far this month
-                example: 25
-              campaignPurchases:
-                minimum: 0
-                type: integer
-                description: Total number of purchases gained in campaign so far this
-                  month
-                example: 110
-              CPATarget:
-                minimum: 0
-                exclusiveMinimum: true
-                type: number
-                description: The goal cost per acquisition
-                example: 220
-              daysLeft:
-                maximum: 30
-                minimum: 0
-                exclusiveMinimum: true
-                type: integer
-                description: How many days are left in the month
-                example: 5
-      required: true
-    Facebook:
-      content:
-        application/json:
-          schema:
-            properties:
-              data:
-                type: array
-                description: Facebook ads data
-                items:
-                  properties:
-                    id:
-                      type: string
-                      description: The unique ad identifier
-                      example: "6257020051607"
-                    name:
-                      type: string
-                      description: The unique asset name
-                      example: PR_SimilarBrands_F_20-54_US+CA_ALL_ALL____
-                    dailyBudget:
-                      minimum: 0
-                      exclusiveMinimum: true
-                      type: number
-                      description: The dollar amount of budget for this asset
-                      example: 1200
-                    spend:
-                      minimum: 0
-                      exclusiveMinimum: true
-                      type: number
-                      description: The dollar amount the asset has spent in its lifetime
-                      example: 1000
-                    purchases:
-                      minimum: 0
-                      type: integer
-                      description: The total number of purchases attributed to the
-                        asset in its lifetime
-                      example: 10
-              targetCpa:
-                minimum: 0
-                exclusiveMinimum: true
-                type: number
-                description: The target cost per acquisition in dollars
-                example: 50
-              oddsThresh:
-                minimum: 0
-                exclusiveMinimum: true
-                type: number
-                description: Decision threshold for status field indicator
-                example: 10
-      required: true
+            $ref: '#/components/schemas/DefaultError'
