@@ -548,7 +548,7 @@ components:
       description: Used in conjunction with <IN> operator
       items:
         type: string
-        example: "[\"ACTIVE\"]"
+        example: ACTIVE
         enum:
         - ACTIVE
         - PAUSED
@@ -600,7 +600,8 @@ components:
           example: See app.fates.ai/api/v1/docs/optimize
     time_increment:
       oneOf:
-      - type: array
+      - type: string
+        default: all_days
         enum:
         - monthly
         - all_days
