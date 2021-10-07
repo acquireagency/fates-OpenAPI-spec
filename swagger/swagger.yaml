@@ -389,7 +389,8 @@ paths:
         explode: false
         schema:
           type: string
-          example: "1273871897857"
+          description: comma spearated list of ids
+          example: "1273871897857,347183464585"
       requestBody:
         $ref: '#/components/requestBodies/AdUpdate'
       responses:
