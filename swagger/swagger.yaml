@@ -29,6 +29,8 @@ tags:
   description: Ad/AdSet optimizations
 - name: Facebook
   description: Methods relating to Facebook's Graph API
+- name: Auth
+  description: AuthN/AuthZ related methods
 paths:
   /optimize:
     post:
@@ -372,6 +374,90 @@ paths:
           description: Success
       x-google-backend:
         address: "https://fates-api-lqbezgosoq-uc.a.run.app/v1/facebook/{accountId}/insights"
+  /facebook/{adId}:
+    put:
+      tags:
+      - Facebook
+      summary: Update an ad
+      description: Change the field of an ad
+      operationId: api.facebook.views.update_ad
+      parameters:
+      - name: adId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: "1273871897857"
+      requestBody:
+        $ref: '#/components/requestBodies/AdUpdate'
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200'
+      x-google-backend:
+        address: "https://fates-api-lqbezgosoq-uc.a.run.app/v1/facebook/{adId}"
+    options:
+      tags:
+      - Facebook
+      summary: Reponse to a preflight request
+      operationId: api.facebook.views.options_ad
+      parameters:
+      - name: adId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Success
+      x-google-backend:
+        address: "https://fates-api-lqbezgosoq-uc.a.run.app/v1/facebook/{adId}"
+  /sessionLogin:
+    post:
+      tags:
+      - Auth
+      summary: Authenticate user
+      description: Validate current user's ID Token and start a session
+      operationId: api.sessionLogin.views.session_login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/sessionLogin_body'
+      responses:
+        "200":
+          description: login successful
+          headers:
+            Set-Cookie:
+              style: simple
+              explode: false
+              schema:
+                type: string
+                example: session=abcde12345; Path=/v1; SameSite=None; Secure; Expires=2021-10-12
+                  13:31
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200'
+      x-google-backend:
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/sessionLogin
+    options:
+      tags:
+      - Auth
+      summary: Reponse to a preflight request
+      operationId: api.sessionLogin.views.options_session_login
+      responses:
+        "200":
+          description: Success
+      x-google-backend:
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/sessionLogin
 components:
   schemas:
     OptimizationData:
@@ -608,6 +694,17 @@ components:
       - type: integer
         description: "If it is an integer, it is the number of days from 1 to 90."
         example: 1
+    inline_response_200:
+      properties:
+        status:
+          type: string
+          example: success
+    sessionLogin_body:
+      type: object
+      properties:
+        idToken:
+          type: string
+          example: "ey123h,df87a8dfjf-1237"
     OptResults_totals:
       type: object
       properties:
@@ -934,4 +1031,17 @@ components:
                 type: number
                 description: Decision threshold for status field indicator
                 example: 10
+      required: true
+    AdUpdate:
+      content:
+        application/json:
+          schema:
+            properties:
+              status:
+                type: string
+                enum:
+                - ACTIVE
+                - PAUSED
+                - ARCHIVED
+                - DELETED
       required: true
