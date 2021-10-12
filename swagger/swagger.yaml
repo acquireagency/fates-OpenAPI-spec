@@ -195,7 +195,7 @@ paths:
       tags:
        - Facebook
       summary: Reponse to a preflight request
-      operationId: api.facebook.views.options_ad
+      operationId: api.facebook.views.options_update_ads
       x-google-backend:
         address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/facebook/ads
       responses:
@@ -206,7 +206,7 @@ paths:
        - Facebook
       summary: Update fields of facebook ad objects
       description: Change the field of an ad
-      operationId: api.facebook.views.update_ad
+      operationId: api.facebook.views.update_ads
       x-google-backend:
         address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/facebook/ads
       requestBody:
