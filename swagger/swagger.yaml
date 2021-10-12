@@ -28,6 +28,8 @@ tags:
   description: Ad/AdSet optimizations
 - name: Facebook
   description: Methods relating to Facebook's Graph API
+- name: Auth
+  description: AuthN/AuthZ related methods
 paths:
   /optimize:
     options:
@@ -185,9 +187,86 @@ paths:
                 ad_data:
                   value:
                     ad_name: 'PR_M/F_28-45_Sports'
-                    ad_id: 123456789
+                    ad_id: 23849125833210264
                     spend: 500
                     omni_purchase: 10
+  /facebook/ads:
+    options:
+      tags:
+       - Facebook
+      summary: Reponse to a preflight request
+      operationId: api.facebook.views.options_ad
+      x-google-backend:
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/facebook/ads
+      responses:
+        200:
+          description: Success
+    patch:
+      tags:
+       - Facebook
+      summary: Update fields of facebook ad objects
+      description: Change the field of an ad
+      operationId: api.facebook.views.update_ad
+      x-google-backend:
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/facebook/ads
+      requestBody:
+        $ref: '#/components/requestBodies/AdUpdate'
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/requestBodies/AdUpdate'
+              example:
+                - id: 23849125833210264
+                  status: success
+                - id: 23849217817540264
+                  status: error
+                  
+  /sessionLogin:
+    options:
+      tags:
+        - Auth
+      summary: Reponse to a preflight request
+      operationId: api.sessionLogin.views.options_session_login
+      x-google-backend:
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/sessionLogin
+      responses:
+        200:
+          description: Success
+    post:
+      tags:
+        - Auth
+      summary: Authenticate user 
+      description: Validate current user's ID Token and start a session
+      operationId: api.sessionLogin.views.session_login
+      x-google-backend:
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/sessionLogin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                idToken:
+                  type: string
+                  example: ey123h,df87a8dfjf-1237
+      responses:
+        200:
+          description: login successful
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    example: success
+          headers: 
+            Set-Cookie:
+              schema: 
+                type: string
+                example: session=abcde12345; Path=/v1; SameSite=None; Secure; Expires=2021-10-12 13:31
 components:
   schemas:
     OptimizationData:
@@ -618,6 +697,29 @@ components:
                 minimum: 0
                 exclusiveMinimum: true
                 example: 10
+    AdUpdate:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  description: The ad id
+                  example: 23849125833210264
+                status:
+                  type: string
+                  description: The status of the ad
+                  enum:
+                    - ACTIVE
+                    - PAUSED
+                    - ARCHIVED
+                    - DELETED
+                    - success
+                    - error
   parameters:
     AccountId:
       in: path
