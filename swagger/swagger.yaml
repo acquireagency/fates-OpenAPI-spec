@@ -30,6 +30,8 @@ tags:
   description: Methods relating to Facebook's Graph API
 - name: Auth
   description: AuthN/AuthZ related methods
+- name: Actions
+  description: History of actions performed and available methods on them
 paths:
   /optimize:
     options:
@@ -195,7 +197,7 @@ paths:
       tags:
        - Facebook
       summary: Reponse to a preflight request
-      operationId: api.facebook.views.options_update_ads
+      operationId: api.facebook.views.options_batch_update_ads
       x-google-backend:
         address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/facebook/ads
       responses:
@@ -204,9 +206,9 @@ paths:
     patch:
       tags:
        - Facebook
-      summary: Update fields of facebook ad objects
+      summary: Batch update fields of facebook ad objects
       description: Change the field of an ad
-      operationId: api.facebook.views.update_ads
+      operationId: api.facebook.views.batch_update_ads
       x-google-backend:
         address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/facebook/ads
       requestBody:
@@ -223,7 +225,67 @@ paths:
                   status: success
                 - id: 23849217817540264
                   status: error
-                  
+  /facebook/ads/{adId}:
+    patch:
+      tags:
+       - Facebook
+      summary: Update fields of facebook ad objects
+      description: Change the field of an ad
+      operationId: api.facebook.views.update_ads
+      x-google-backend:
+        address: https://fates-api-lqbezgosoq-uc.a.run.app/v1/facebook/ads
+      parameters:
+        - in: path
+          name: adId
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: status
+          required: true
+          schema:
+            type: string
+            enum:
+              - ACTIVE
+              - PAUSED
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/requestBodies/AdUpdate'
+              example:
+                - id: 23849125833210264
+                  status: success
+                - id: 23849217817540264
+                  status: error
+  /actions/{actionId}/undo:
+    post:
+      tags:
+        - Actions
+      summary: Undo an action given the unique action id
+      description: Does the opposite action of some other logged action matching the given id
+      operationId: api.actions.views.undo
+      parameters:
+        - in: path
+          name: actionId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Action successfully undone
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                      - failure
   /sessionLogin:
     options:
       tags:
