@@ -32,6 +32,8 @@ tags:
   description: AuthN/AuthZ related methods
 - name: Actions
   description: History of actions performed and available methods on them
+- name: Killbot
+  description: Methods related to The Fates Killbot
 paths:
   /optimize:
     options:
@@ -266,7 +268,7 @@ paths:
         - Actions
       summary: Undo an action given the unique action id
       description: Does the opposite action of some other logged action matching the given id
-      operationId: api.actions.views.undo
+      operationId: api.actions.views.undo_action
       parameters:
         - in: path
           name: actionId
@@ -276,6 +278,146 @@ paths:
       responses:
         200:
           description: Action successfully undone
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                      - failure
+  /actions:
+    get:
+      tags:
+        - Actions
+      summary: Get all actions
+      description: Returns all actions that have been logged
+      operationId: api.actions.views.get_all_actions
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Actions'
+  /actions/{actionId}:
+    get:
+      tags:
+        - Actions
+      summary: Get a specific action
+      description: Returns an action with the given actionId
+      operationId: api.actions.views.get_action
+      parameters: 
+        - in: path
+          name: actionId
+          schema:
+            type: string
+          required: true
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Actions'
+  /scheduler:
+    get:
+      tags:
+        - Killbot
+      summary: Get all scheduled jobs
+      description: Returns all configured jobs
+      operationId: api.scheduler.views.get_jobs
+      parameters:
+        - in: query
+          name: page_token
+          required: false
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Successful operation
+          content:
+            appication/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+    post:
+      tags:
+        - Killbot
+      summary: Create a scheduled job
+      description: Schedule and configure a killbot job
+      operationId: api.sceduler.views.create_job
+      requestBody:
+        $ref: '#/components/requestBodies/CreateJob'
+      responses:
+        200:
+          description: Action successfully undone
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                      - failure
+  /scheduler/{jobName}:
+    delete:
+      tags:
+        - Killbot
+      summary: Delete a scheduled job
+      description: Permatently deletes a scheduled job given the id
+      operationId: api.scheduler.views.delete_job
+      parameters:
+        - in: path
+          name: jobName
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Successfully deleted job
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                      - failure
+    patch:
+      tags:
+        - Killbot
+      summary: Change a job's status
+      description: Pause or enable a scheduled job
+      operationId: api.scheduler.views.change_job_status
+      parameters:
+        - in: path
+          name: jobName
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  description: The action to be performed on the job
+                  enum:
+                    - "pause"
+                    - "enable"
+      responses:
+        200:
+          description: Successfully changed the jobs status
           content:
             application/json:
               schema:
@@ -584,6 +726,109 @@ components:
             - type: number
             - type: integer
             - type: string
+    Actions:
+      properties:
+        id:
+          description: Unique action id
+          type: string
+        date:
+          description: UTC datetime
+          format: date-time
+          type: string
+        isUndone:
+          description: Identifier for if this action has been undone
+          type: boolean
+        type:
+          description: The action type
+          type: string
+          enum:
+            - killbotJob
+            - killbotManageAd
+            - undo
+        userEmail:
+          description: The email of the user who performed the action
+          type: string
+        extraInfo:
+          type: object
+          properties:
+            field:
+              type: string
+              example: status
+              description: The field being acted upon / updated
+            resource:
+              description: What is the object/resource being updated
+              type: string
+              enum:
+                - ad
+                - adset
+                - campaign
+            resourceId:
+              type: integer
+              description: Facebook's unique resource identifier
+              example: "123456789"
+            valueFrom:
+              type: string
+              description: The previous value for the field that is to be updated
+              example: "ACTIVE"
+            valueTo:
+              type: string
+              description: The new value for the field that is to be updated
+              example: "PAUSED"
+    Job:
+      properties:
+        accountId:
+          description: The ID for the ad account
+          type: string
+          example: "123456789"
+        name:
+          description: The job name
+          type: string
+          example: "MyJob"
+        schedule:
+          description: The cron formatted schedule
+          type: string
+          example: "*/5 * * * *"
+        state:
+          description: The job state
+          type: string
+          enum:
+            - ENABLED
+            - PAUSED
+            - DISABLED
+            - STATE_UNSPECIFIED
+            - UPDATE_FAILED
+    JobConfig:
+      properties:
+        name:
+          type: string
+          description: The job name
+          example: "Test Job"
+        description:
+          type: string
+          description: The job description
+        http_target:
+          type: string
+          description: Configured killbot URI
+        http_method:
+          type: string
+          description: HTTP verb
+          example: "POST"
+        headers:
+          type: object
+          description: Headers to send in the job http target
+          example: {"Content-Type": "application/json"}
+        oidc_token:
+          type: object
+          description: Authorization header config
+          properties:
+            service_account_email:
+              type: string
+              description: email of the authorizing service account
+              example: "cloud-scheduler@PROJECT_ID.iam.gserviceaccount.com"
+            audience:
+              type: string
+              description: The aud uri for the token
+              example: "https://api.fates.ai/v1/killbot"
     DefaultError:
       required:
       - timestamp
@@ -782,6 +1027,23 @@ components:
                     - DELETED
                     - success
                     - error
+    CreateJob:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              parent:
+                type: string
+                description: The location name
+                example: "projects/PROJECT_ID/locations/LOCATION_ID"
+              job:
+                $ref: '#/components/schemas/JobConfig'
+              schedule:
+                type: string
+                description: Cron job schedule
+                example: "*/5 * * * *"
   parameters:
     AccountId:
       in: path
